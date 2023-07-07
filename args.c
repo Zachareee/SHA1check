@@ -72,6 +72,6 @@ int parse_args(int argc, char **argv, char **src,
 
     *src = source;
     *dst = destination;
-    *dir = getcwd(directory, PATH_MAX);
+    *dir = directory;
     return 0;
 }

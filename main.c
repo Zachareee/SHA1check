@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
     // if parse_args returns -1 exit program
     int exit = parse_args(argc, argv, &src, &dst, &dir);
     if (exit) return exit;
+    get_real_path(&dir);
 
     if ((exit = loop_files(dir))) {
         printf("Something went wrong while reading the files\n");
@@ -30,7 +31,6 @@ int main(int argc, char **argv) {
     }
 
     free(ptr);
-    printf("%s", dir);
     FILE *hashfile = open_file(dir, src, "r");
     get_line(hashfile);
     printf("File count total: %d\n", file_count);

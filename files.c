@@ -1,12 +1,14 @@
 #include <ftw.h>
-#include <unistd.h>
+#include <limits.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <unistd.h>
 
 #include "datatypes.h"
 
 file_struct *files = NULL;
+char dir_prefix[PATH_MAX];
 int file_count = 0;
 
 int file_iterator(const char *path, const struct stat *sb, int type) {
@@ -27,20 +29,34 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
 }
 
 int loop_files(char *dir) {
-    // force ftw to output full path and get dir_len to cut
+    realpath(dir, dir_prefix);
+    int len = strlen(dir_prefix);
+    dir_prefix[len] = '/';
+    dir_prefix[len + 1] = '\0';
     return ftw(dir, &file_iterator, 1);
 }
 
 
 FILE *open_file(char *dir, char *src, char *opt) {
     // constructs path to hashfile
-    char *hashfile = malloc(strlen(dir) + strlen(src) + 2);
+    char hashfile[strlen(dir) + strlen(src) + 1];
     strcpy(hashfile, dir);
-    strcat(strcat(hashfile, "/"), src);
-    printf("%s\n", hashfile);
+    strcat(hashfile, src);
 
     // opens file buffer and frees malloc
     FILE *f = fopen(hashfile, opt);
-    free(hashfile);
     return f;
+}
+
+// mallocs an absolute path
+void get_real_path(char **dir) {
+    char *path = malloc(PATH_MAX * sizeof(char));
+    realpath(*dir, path);
+
+    // adds an additional slash
+    int len = strlen(path);
+    path[len] = '/';
+    path[len + 1] = '\0';
+
+    *dir = path;
 }
