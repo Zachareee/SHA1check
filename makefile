@@ -2,7 +2,7 @@ CC=clang
 CF=$(CFLAGS)
 CFLAGS=-c -Wall -I headers
 CFLAGSS=-c -Wall -fsanitize=address -I headers
-OBJECTS=args.o compare.o files.o hashing.o paths.o main.o
+OBJECTS=args.o compare.o dir.o files.o hashing.o paths.o main.o
 all: prog clean run
 
 prog: $(OBJECTS)
@@ -13,6 +13,9 @@ args.o:args.c
 
 compare.o:compare.c
 	$(CC) $(CF) compare.c
+
+dir.o:dir.c
+	$(CC) $(CF) dir.c
 
 files.o:files.c
 	$(CC) $(CF) files.c

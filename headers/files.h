@@ -1,4 +1,5 @@
-extern char **files;
+#include "datatypes.h"
+extern file_struct *files;
 extern int file_count;
 
 int loop_files(char *dir);

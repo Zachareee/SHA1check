@@ -5,6 +5,7 @@
 
 #include "args.h"
 #include "compare.h"
+#include "dir.h"
 #include "files.h"
 #include "hashing.h"
 #include "paths.h"
@@ -53,15 +54,13 @@ int main(int argc, char **argv) {
 
     fclose(hashfile);
 
-    // type cast because for some reason it becomes char **
-    // instead of file_struct*
-    file_struct *ptr = (file_struct *)files;
     for (int i = 0; i < file_count; i++) {
-        if (ptr[i].checked) printf("Debug: %s checked\n", ptr[i].name);
-        free(ptr[i].name);
+        if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
+        free(files[i].name);
     }
 
-    free(ptr);
+    free(files);
 
     // printf("File count total: %d\n", file_count);
+    free(create_dir());
 }
