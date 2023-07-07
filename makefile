@@ -3,7 +3,7 @@ CF=$(CFLAGS)
 CFLAGS=-c -Wall -I headers
 CFLAGSS=-c -Wall -fsanitize=address -I headers
 OBJECTS=args.o compare.o files.o hashing.o paths.o main.o
-all: prog clean
+all: prog clean run
 
 prog: $(OBJECTS)
 	$(CC) $(OBJECTS) -lcrypto -fsanitize=address -o main
@@ -28,3 +28,6 @@ main.o:main.c
 
 clean:
 	rm -rf *.o
+
+run:
+	 ./main .

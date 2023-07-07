@@ -31,29 +31,33 @@ int main(int argc, char **argv) {
         return -2;
     }
 
-    // if ((exit = loop_files(dir))) {
-    //     printf("Something went wrong while reading the files\n");
-    //     return exit;
-    // }
+    if ((exit = loop_files(dir))) {
+        printf("Something went wrong while reading the files\n");
+        return exit;
+    }
 
-    // // type cast because for some reason it becomes char **
-    // // instead of file_struct*
-    // file_struct *ptr = (file_struct *)files;
-    // for (int i = 0; i < file_count; i++) {
-    //     char *result = hash(ptr[i]);
-    //     free(result);
-    //     free(ptr[i].name);
-    // }
-
-    // free(ptr);
     FILE *hashfile = fopen(src, "r");
 
-    // DEBUG
     char *line = get_line(hashfile);
-    int c = compare(dir, line);
-    printf("%d\n",c);
+    while (line) {
+        int c = compare(dir, line);
+        if (!c) mark_file(line);
+        line = get_line(hashfile);
+    }
 
-    printf("File count total: %d\n", file_count);
+    fclose(hashfile);
+
+    // type cast because for some reason it becomes char **
+    // instead of file_struct*
+    file_struct *ptr = (file_struct *)files;
+    for (int i = 0; i < file_count; i++) {
+        if (ptr[i].checked) printf("%s checked\n", ptr[i].name);
+        free(ptr[i].name);
+    }
+
+    free(ptr);
+
+    // printf("File count total: %d\n", file_count);
     free(src);
     free(dst);
     free(dir);

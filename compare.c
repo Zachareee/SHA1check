@@ -39,7 +39,9 @@ int compare(char *dir, char *line) {
 
     // trim line to find file
     trim(line, pmatch[0].rm_so);
+    fprintf(stderr, "Checking %s...", line);
     concat_path(dir, &line);
+    if (!check_exists(line, 1)) return -2;
 
     // construct file_struct to give to hash function
     struct stat s;
@@ -47,6 +49,7 @@ int compare(char *dir, char *line) {
     file_struct f = {line, s.st_size};
     char *hash_value = hash(f);
     int result = strcmp(hash_value, hex);
+    printf("OK\n");
 
     // free malloc-ed variables
     free(hash_value);
