@@ -26,6 +26,11 @@ int main(int argc, char **argv) {
         return -1;
     }
 
+    if (comp_init()) {
+        printf("Something went wrong while initialising pattern matcher\n");
+        return -2;
+    }
+
     // if ((exit = loop_files(dir))) {
     //     printf("Something went wrong while reading the files\n");
     //     return exit;
@@ -43,16 +48,13 @@ int main(int argc, char **argv) {
     // free(ptr);
     FILE *hashfile = fopen(src, "r");
 
-    if (comp_init()) {
-        printf("Something went wrong while initialising pattern matcher\n");
-        return -2;
-    }
     // DEBUG
     char *line = get_line(hashfile);
-
     int c = compare(dir, line);
-    printf("%d",c);
-    free(line);
+    printf("%d\n",c);
 
     printf("File count total: %d\n", file_count);
+    free(src);
+    free(dst);
+    free(dir);
 }

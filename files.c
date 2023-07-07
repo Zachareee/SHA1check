@@ -10,6 +10,7 @@
 file_struct *files = NULL;
 int file_count = 0;
 
+// iterate through directories
 int file_iterator(const char *path, const struct stat *sb, int type) {
     // return if encounter directory
     if (type != FTW_F) return 0;
@@ -18,7 +19,6 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
     files = realloc(files, (file_count + 1) * sizeof(file_struct));
 
     // assign new file in array and increment file counter
-    // file_struct *file = malloc(sizeof(file_struct));
     char *name = malloc((sizeof(char) + 1) * strlen(path));
     strcpy(name, path);
     size_t size = sb->st_size;
@@ -36,14 +36,14 @@ char *get_line(FILE *f) {
     char *line = malloc(LINELEN * sizeof(char));
     line[0] = '\0';
 
+    // collects chunks of bytes until encounter linebreak
     while(fgets(buffer, LINELEN, f) != NULL) {
-        //printf("%s\n", line);
         strcat(line, buffer);
         if (line[strlen(line) - 1] == '\n') return line;
         line = realloc(line, (strlen(line) + LINELEN) * sizeof(char));
     }
 
-    //printf("This line does not end with a linebreak: %s", line);
+    printf("This line does not end with a linebreak: %s", line);
     free(line);
     return NULL;
 }

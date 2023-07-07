@@ -12,18 +12,21 @@
 regex_t reghex;
 regex_t regws;
 
+// init regex sequences
 int comp_init() {
     int regh = regcomp(&reghex, "[0-9a-zA-Z]{40}", REG_EXTENDED);
     int regw = regcomp(&regws, "\\s", REG_EXTENDED);
     return regh + regw;
 }
 
+// trim whitespaces in the line
 void trim(char *line, int offset) {
     for (int i = offset - 1; line[i] == ' '; i--) {
         line[i] = 0;
     }
 }
 
+// compare hash of file against recorded hash
 int compare(char *dir, char *line) {
     regmatch_t pmatch[1];
     char hex[41];
@@ -38,13 +41,14 @@ int compare(char *dir, char *line) {
     trim(line, pmatch[0].rm_so);
     concat_path(dir, &line);
 
+    // construct file_struct to give to hash function
     struct stat s;
     stat(line, &s);
     file_struct f = {line, s.st_size};
     char *hash_value = hash(f);
-    printf("%s\n%s\n", hash_value, hex);
     int result = strcmp(hash_value, hex);
 
+    // free malloc-ed variables
     free(hash_value);
     free(line);
     return !!result;

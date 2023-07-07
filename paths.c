@@ -16,6 +16,7 @@ void get_abs_path(char **dir) {
     *dir = path;
 }
 
+// mallocs a path/file string
 void concat_path(char *dir, char **file) {
     char *ptr = malloc((strlen(dir) + strlen(*file) + 1) * sizeof(char));
     *ptr = '\0';
