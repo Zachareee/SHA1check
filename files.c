@@ -50,12 +50,7 @@ char *get_line(FILE *f) {
 
 // checks if path exists as d: dir or f: file
 int check_exists(char *path, int file) {
-    return 1;
     struct stat s;
     stat(path, &s);
-    if (!file) return S_ISDIR(s.st_mode);
-    FILE *f = fopen(path, "r");
-    if (!f) return 0;
-    fclose(f);
-    return 1;
+    return file ? S_ISREG(s.st_mode) : S_ISDIR(s.st_mode);
 }

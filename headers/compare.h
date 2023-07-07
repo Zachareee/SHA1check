@@ -1,1 +1,2 @@
-int compare(char *line);
+int compare(char *dir, char *line);
+int comp_init();

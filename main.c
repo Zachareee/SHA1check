@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "args.h"
 #include "compare.h"
@@ -40,14 +41,17 @@ int main(int argc, char **argv) {
     // }
 
     // free(ptr);
-    printf("%s\n",src);
     FILE *hashfile = fopen(src, "r");
 
+    if (comp_init()) {
+        printf("Something went wrong while initialising pattern matcher\n");
+        return -2;
+    }
     // DEBUG
     char *line = get_line(hashfile);
 
-    compare(line);
-    printf("%s", line);
+    int c = compare(dir, line);
+    printf("%d",c);
     free(line);
 
     printf("File count total: %d\n", file_count);
