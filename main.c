@@ -5,6 +5,7 @@
 #include "compare.h"
 #include "files.h"
 #include "hashing.h"
+#include "paths.h"
 
 int main(int argc, char **argv) {
     char *src;
@@ -12,9 +13,17 @@ int main(int argc, char **argv) {
     char *dir;
 
     // if parse_args returns -1 exit program
-    int exit = parse_args(argc, argv, &src, &dst, &dir);
-    if (exit) return exit;
-    get_real_path(&dir);
+    int exit;
+    if ((exit = parse_args(argc, argv, &src, &dst, &dir))) return exit;
+
+    // checks if file exists
+    get_abs_path(&dir);
+    concat_path(dir, &src);
+    concat_path(dir, &dst);
+    if (!(check_exists(src, 1) && check_exists(dir, 0))) {
+        printf("Check your inputs\n");
+        return -1;
+    }
 
     if ((exit = loop_files(dir))) {
         printf("Something went wrong while reading the files\n");
@@ -31,9 +40,12 @@ int main(int argc, char **argv) {
     }
 
     free(ptr);
-    // DEBUG
     FILE *hashfile = open_file(dir, src, "r");
+
+    // DEBUG
     char *line = get_line(hashfile);
+
+    compare(line);
     printf("%s", line);
     free(line);
 

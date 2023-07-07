@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "datatypes.h"
+#define LINELEN 12
 
 file_struct *files = NULL;
 int file_count = 0;
@@ -43,20 +45,6 @@ FILE *open_file(char *dir, char *src, char *opt) {
     return f;
 }
 
-// mallocs an absolute path
-void get_real_path(char **dir) {
-    char *path = malloc(PATH_MAX * sizeof(char));
-    realpath(*dir, path);
-
-    // adds an additional slash
-    int len = strlen(path);
-    path[len] = '/';
-    path[len + 1] = '\0';
-
-    // assigns back to directory
-    *dir = path;
-}
-
 char *get_line(FILE *f) {
     char buffer[LINELEN];
     char *line = malloc(LINELEN * sizeof(char));
@@ -72,4 +60,15 @@ char *get_line(FILE *f) {
     printf("This line does not end with a linebreak: %s", line);
     free(line);
     return NULL;
+}
+
+// checks if path exists as d: dir or f: file
+int check_exists(char *path, int file) {
+    struct stat s;
+    stat(path, &s);
+    if (!file) return S_ISDIR(s.st_mode);
+    FILE *f = fopen(path, "r");
+    if (!f) return 0;
+    fclose(f);
+    return 1;
 }
