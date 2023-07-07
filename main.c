@@ -9,18 +9,18 @@
 #include "hashing.h"
 #include "paths.h"
 
-char src[PATH_MAX];
-char dst[PATH_MAX];
-char dir[PATH_MAX];
-
 int main(int argc, char **argv) {
+    char src[PATH_MAX];
+    char dst[PATH_MAX];
+    char dir[PATH_MAX];
+
     // if parse_args returns -1 exit program
     int exit;
-    if ((exit = parse_args(argc, argv, &src, &dst, &dir))) return exit;
+    if ((exit = parse_args(argc, argv, src, dst, dir))) return exit;
 
     // checks if file exists
-    concat_path(dir, &src);
-    concat_path(dir, &dst);
+    concat_path(dir, src);
+    concat_path(dir, dst);
     if (!check_exists(dir, 0)) {
         printf("%s is not a directory\n", dir);
         return -1;
@@ -47,6 +47,7 @@ int main(int argc, char **argv) {
     while (line) {
         int c = compare(dir, line);
         if (!c) mark_file(dir, line);
+        free(line);
         line = get_line(hashfile);
     }
 

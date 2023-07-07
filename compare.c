@@ -39,7 +39,7 @@ int compare(char *dir, char *line) {
 
     // trim line to find file
     trim(line, pmatch[0].rm_so);
-    concat_path(dir, &line);
+    concat_path(dir, line);
     if (!check_exists(line, 1)) return -2;
 
     fprintf(stderr, "Checking %s...", get_relative_path(dir, line));
@@ -53,6 +53,5 @@ int compare(char *dir, char *line) {
 
     // free malloc-ed variables
     free(hash_value);
-    free(line);
     return !!result;
 }

@@ -1,5 +1,5 @@
-char **files;
-int file_count;
+extern char **files;
+extern int file_count;
 
 int loop_files(char *dir);
 char *get_line(FILE *f);

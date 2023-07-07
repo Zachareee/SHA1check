@@ -17,15 +17,13 @@ char *get_abs_path(char *dir) {
     return path;
 }
 
-// mallocs a path/file string
-void concat_path(char *dir, char **file) {
-    char *ptr = malloc((strlen(dir) + strlen(*file) + 2) * sizeof(char));
+void concat_path(char *dir, char *file) {
+    char ptr[PATH_MAX];
     *ptr = '\0';
     strcat(ptr, dir);
     strcat(ptr, "/");
-    strcat(ptr, *file);
-    ptr[strlen(ptr)] = '\0';
-    *file = ptr;
+    strcat(ptr, file);
+    strcpy(file, ptr);
 }
 
 char *get_relative_path(char *dir, char *file) {
