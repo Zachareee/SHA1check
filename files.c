@@ -52,6 +52,8 @@ char *get_line(FILE *f) {
 int check_exists(char *path, int file) {
     struct stat s;
     stat(path, &s);
+    // if (!status) printf("%s is not a %s\n", path,
+    //     file ? "file" : "directory");
     return file ? S_ISREG(s.st_mode) : S_ISDIR(s.st_mode);
 }
 

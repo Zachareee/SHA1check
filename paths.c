@@ -1,11 +1,12 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
 
 // mallocs an absolute path
-void get_abs_path(char **dir) {
+char *get_abs_path(char *dir) {
     char *path = malloc(PATH_MAX * sizeof(char));
-    realpath(*dir, path);
+    realpath(dir, path);
 
     // adds an additional slash
     // int len = strlen(path);
@@ -13,7 +14,7 @@ void get_abs_path(char **dir) {
     // path[len + 1] = '\0';
 
     // assigns back to directory
-    *dir = path;
+    return path;
 }
 
 // mallocs a path/file string
