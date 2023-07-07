@@ -1,2 +1,2 @@
-void get_line(FILE *f);
+char *get_line(FILE *f);
 int compare_all(char *dir, char *src);

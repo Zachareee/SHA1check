@@ -17,9 +17,6 @@ compare.o:compare.c
 files.o:files.c
 	$(CC) $(CF) files.c
 
-hashing.o:hashing.c
-	$(CC) $(CF) hashing.c
-
 main.o:main.c
 	$(CC) $(CF) main.c
 

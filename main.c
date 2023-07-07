@@ -31,7 +31,11 @@ int main(int argc, char **argv) {
     }
 
     free(ptr);
+    // DEBUG
     FILE *hashfile = open_file(dir, src, "r");
-    get_line(hashfile);
+    char *line = get_line(hashfile);
+    printf("%s", line);
+    free(line);
+
     printf("File count total: %d\n", file_count);
 }

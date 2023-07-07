@@ -3,14 +3,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LINELEN 128
+#define LINELEN 12
 
 regex_t regex;
 
-void get_line(FILE *f) {
-    char *line = malloc(128 * sizeof(char));
-    fgets(line, LINELEN, f);
-    printf("%s: %s", line[strlen(line)-1] == '\n' ? "OK" : "BAD", line);
+char *get_line(FILE *f) {
+    char buffer[LINELEN];
+    char *line = malloc(LINELEN * sizeof(char));
+    line[0] = '\0';
+
+    while(fgets(buffer, LINELEN, f) != NULL) {
+        printf("%s\n", line);
+        strcat(line, buffer);
+        if (line[strlen(line) - 1] == '\n') return line;
+        line = realloc(line, (strlen(line) + LINELEN) * sizeof(char));
+    }
+
+    printf("This line does not end with a linebreak: %s", line);
+    free(line);
+    return NULL;
 }
 
 //FILE *find_file(char *dir) {
