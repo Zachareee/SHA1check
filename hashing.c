@@ -5,12 +5,6 @@
 #include "datatypes.h"
 #define CHUNK 65536
 
-//struct cleanup_hashing {
-//    char *result;
-//};
-//
-//struct cleanup_hashing cleanup;
-
 char byte_to_hex(char b) {
     switch (b) {
         case 10:
