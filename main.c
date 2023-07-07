@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
     char *line = get_line(hashfile);
     while (line) {
         int c = compare(dir, line);
-        if (!c) mark_file(line);
+        if (!c) mark_file(dir, line);
         line = get_line(hashfile);
     }
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     // instead of file_struct*
     file_struct *ptr = (file_struct *)files;
     for (int i = 0; i < file_count; i++) {
-        if (ptr[i].checked) printf("%s checked\n", ptr[i].name);
+        if (ptr[i].checked) printf("Debug: %s checked\n", ptr[i].name);
         free(ptr[i].name);
     }
 

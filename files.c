@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 #include "datatypes.h"
+#include "paths.h"
 #define LINELEN 128
 
 file_struct *files = NULL;
@@ -28,10 +29,7 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
 }
 
 int loop_files(char *dir) {
-    char path[strlen(dir) + 1];
-    strcpy(path,dir);
-    path[strlen(path) - 1] = 0;
-    return ftw(path, &file_iterator, 1);
+    return ftw(dir, &file_iterator, 1);
 }
 
 char *get_line(FILE *f) {
@@ -58,9 +56,9 @@ int check_exists(char *path, int file) {
 }
 
 // marks a file in the file_struct array as checked
-void mark_file(char *filename) {
+void mark_file(char *dir, char *filename) {
     for (int i = 0; i < file_count; i++) {
-        if (!strcmp(filename, files[i].name)) {
+        if (!strcmp(filename, get_relative_path(dir, files[i].name))) {
             files[i].checked = 1;
             return;
         }
