@@ -25,22 +25,23 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    if ((exit = loop_files(dir))) {
-        printf("Something went wrong while reading the files\n");
-        return exit;
-    }
+    // if ((exit = loop_files(dir))) {
+    //     printf("Something went wrong while reading the files\n");
+    //     return exit;
+    // }
 
-    // type cast because for some reason it becomes char **
-    // instead of file_struct*
-    file_struct *ptr = (file_struct *)files;
-    for (int i = 0; i < file_count; i++) {
-        char *result = hash(ptr[i]);
-        free(result);
-        free(ptr[i].name);
-    }
+    // // type cast because for some reason it becomes char **
+    // // instead of file_struct*
+    // file_struct *ptr = (file_struct *)files;
+    // for (int i = 0; i < file_count; i++) {
+    //     char *result = hash(ptr[i]);
+    //     free(result);
+    //     free(ptr[i].name);
+    // }
 
-    free(ptr);
-    FILE *hashfile = open_file(dir, src, "r");
+    // free(ptr);
+    printf("%s\n",src);
+    FILE *hashfile = fopen(src, "r");
 
     // DEBUG
     char *line = get_line(hashfile);
