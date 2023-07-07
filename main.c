@@ -1,3 +1,4 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,11 +9,11 @@
 #include "hashing.h"
 #include "paths.h"
 
-int main(int argc, char **argv) {
-    char *src;
-    char *dst;
-    char *dir;
+char src[PATH_MAX];
+char dst[PATH_MAX];
+char dir[PATH_MAX];
 
+int main(int argc, char **argv) {
     // if parse_args returns -1 exit program
     int exit;
     if ((exit = parse_args(argc, argv, &src, &dst, &dir))) return exit;
@@ -62,7 +63,4 @@ int main(int argc, char **argv) {
     free(ptr);
 
     // printf("File count total: %d\n", file_count);
-    free(src);
-    free(dst);
-    free(dir);
 }

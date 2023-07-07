@@ -1,11 +1,12 @@
 #include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 #include <limits.h>
 
 #include "paths.h"
 
-int parse_args(int argc, char **argv, char **src,
-        char **dst, char **dir) {
+int parse_args(int argc, char **argv, char *src,
+        char *dst, char *dir) {
     // if no arguments return
     if (argc < 2) {
         printf("Usage: %s DIRECTORY\n", argv[0]);
@@ -72,8 +73,8 @@ int parse_args(int argc, char **argv, char **src,
         else directory = argv[optind];
     }
 
-    *src = source;
-    *dst = destination;
-    *dir = get_abs_path(directory);
+    strcpy(src, source);
+    strcpy(dst, destination);
+    strcpy(dir, get_abs_path(directory));
     return 0;
 }
