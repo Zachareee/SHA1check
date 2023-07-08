@@ -49,6 +49,8 @@ int main(int argc, char **argv) {
     char ptr[PATH_MAX];
     char *state;
 
+    dir_t *current = calloc(1, sizeof(dir_t));
+
     while (line) {
         strcpy(ptr, line);
         free(line);
@@ -58,6 +60,7 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
+        add_path_to_dir(ptr, current);
         state = "FAILED\n";
         if (!c) {
             mark_file(dir, ptr);
@@ -76,17 +79,14 @@ int main(int argc, char **argv) {
     fclose(checkfile);
     fclose(hashfile);
 
-    dir_t current = {NULL, NULL, 0};
-    append_dir(&current, NULL);
-
-    add_path_to_dir(files[0].name, current.folder[0]);
-    dir_iterator(current.folder[0]);
-    free(current.folder);
+    print_dir(current, 0);
 
     for (int i = 0; i < file_count; i++) {
         //if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
         free(files[i].name);
     }
+
+    free_dir(current);
 
     free(files);
 
