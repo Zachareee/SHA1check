@@ -10,6 +10,6 @@ typedef struct {
 typedef struct dir {
     char *name;
     struct dir **folder;
-    int contents;
+    int num;
 } dir_t;
 #endif

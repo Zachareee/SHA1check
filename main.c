@@ -69,8 +69,12 @@ int main(int argc, char **argv) {
     fclose(checkfile);
     fclose(hashfile);
 
+    dir_t *current;
+    current = calloc(1, sizeof(dir_t));
+    path_to_dir(files[0].name, current);
+    dir_iterator(current);
     for (int i = 0; i < file_count; i++) {
-        if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
+        //if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
         free(files[i].name);
     }
 
