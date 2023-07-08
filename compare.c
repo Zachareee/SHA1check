@@ -1,5 +1,6 @@
 #include <regex.h>
 #include <stdio.h>
+#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -41,14 +42,18 @@ int compare(char *dir, char *line) {
 
     // trim line to find file
     trim(line, pmatch[0].rm_so);
-    concat_path(dir, line);
+
+    // copy to path and concat
+    char path[PATH_MAX];
+    strcpy(path, line);
+    concat_path(dir, path);
     if (!check_exists(line, 1)) return -2;
 
-    fprintf(stderr, "Checking %s...", get_relative_path(dir, line));
+    fprintf(stderr, "Checking %s...", get_relative_path(dir, path));
     // construct file_struct to give to hash function
     struct stat s;
-    stat(line, &s);
-    file_struct_t f = {line, s.st_size};
+    stat(path, &s);
+    file_struct_t f = {path, s.st_size};
     char *hash_value = hash(f);
     int result = strcmp(hash_value, hex);
     printf("OK\n");

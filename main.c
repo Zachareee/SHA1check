@@ -45,20 +45,24 @@ int main(int argc, char **argv) {
     FILE *hashfile = fopen(src, "r");
     FILE *checkfile = fopen(dst, "w");
 
-    char *line = get_line(hashfile);
-    while (line) {
-        int c = compare(dir, line);
-        if (!write_to_file(checkfile, get_relative_path(dir, line))
-            || !write_to_file(checkfile, ": ")
-            || !write_to_file(checkfile,
-            c ? (c == -2 ? "MISSING\n" : "FAILED\n") : "OK\n")) {
-            printf("Something went wrong while writing to %s\n", dst);
-            return -3;
-        }
-        if (!c) mark_file(dir, line);
-        free(line);
-        line = get_line(hashfile);
-    }
+    write_to_file(checkfile, "DEBUG: Hello");
+    // char *line = get_line(hashfile);
+    // char ptr[PATH_MAX];
+    // while (line) {
+    //     strcpy(ptr, line);
+    //     free(line);
+    //     int c = compare(dir, ptr);
+    //     write_to_file(checkfile, "Hi");
+    //     if (!write_to_file(checkfile, ptr)
+    //         || !write_to_file(checkfile, ": ")
+    //         || !write_to_file(checkfile,
+    //         c ? (c == -2 ? "MISSING\n" : "FAILED\n") : "OK\n")) {
+    //         printf("Something went wrong while writing to %s\n", dst);
+    //         return -3;
+    //     }
+    //     if (!c) mark_file(dir, ptr);
+    //     line = get_line(hashfile);
+    // }
 
     fclose(hashfile);
 

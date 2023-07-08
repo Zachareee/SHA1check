@@ -32,6 +32,7 @@ int loop_files(char *dir) {
     return ftw(dir, &file_iterator, 1);
 }
 
+// mallocs a line read from file
 char *get_line(FILE *f) {
     char buffer[LINELEN];
     char *line = malloc(LINELEN * sizeof(char));
@@ -51,7 +52,10 @@ char *get_line(FILE *f) {
 // checks if path exists as d: dir or f: file
 int check_exists(char *path, int file) {
     struct stat s;
-    stat(path, &s);
+    if (stat(path, &s)) {
+        return 0;
+    }
+
     return file ? S_ISREG(s.st_mode) : S_ISDIR(s.st_mode);
 }
 
@@ -68,5 +72,6 @@ void mark_file(char *dir, char *filename) {
 int write_to_file(FILE *f, char *line) {
     int count = strlen(line);
     int write = fwrite(line, sizeof(char), count, f);
+    printf("DEBUG: %s, %d, %d, %d\n", line, *line, count, write);
     return count == write;
 }
