@@ -60,11 +60,13 @@ char *hash(file_struct_t file) {
         EVP_DigestUpdate(ctx, buffer, size);
     }
 
-    // close file
     fclose(f);
 
-    // retrieve digest and parse to hexadecimal
+    // retrieve digest and free
     EVP_DigestFinal(ctx, digest, NULL);
+    free(ctx);
+
+    // parse to hexadecimal
     char *result = malloc(41 * sizeof(char));
     hexdigest(digest, result);
     result[40] = '\0';

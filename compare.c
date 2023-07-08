@@ -20,7 +20,7 @@ int comp_init() {
     return regh + regw;
 }
 
-// trim whitespaces in the line
+// trim trailing whitespaces in the line
 void trim(char *line, int offset) {
     for (int i = offset - 1; line[i] == ' '; i--) {
         line[i] = 0;

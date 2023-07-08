@@ -1,7 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <limits.h>
 
 #include "paths.h"
 
@@ -75,6 +75,6 @@ int parse_args(int argc, char **argv, char *src,
 
     strcpy(src, source);
     strcpy(dst, destination);
-    strcpy(dir, get_abs_path(directory));
+    realpath(directory, dir);
     return 0;
 }
