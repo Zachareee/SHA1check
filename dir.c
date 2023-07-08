@@ -61,7 +61,7 @@ void free_dir(dir_t *dir) {
 
 void print_dir(dir_t *dir, int level) {
     for (int i = 0; i < level; i++) printf("|--");
-    if (level) printf("%s %d\n", dir->name, level);
+    if (level) printf("%s\n", dir->name);
     for (int i = 0; i < dir->num; i++) {
         print_dir(dir->folder[i], level + 1);
     }

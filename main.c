@@ -83,12 +83,10 @@ int main(int argc, char **argv) {
 
     for (int i = 0; i < file_count; i++) {
         //if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
-        free(files[i].name);
     }
 
     free_dir(current);
-
-    free(files);
+    free_files();
 
     // printf("File count total: %d\n", file_count);
 }

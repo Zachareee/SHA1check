@@ -77,3 +77,9 @@ int write_to_file(FILE *f, char *line) {
     fflush(f);
     return count == write;
 }
+
+void free_files() {
+    for (int i = 0; i < file_count; i++)
+        free(files[i].name);
+    free(files);
+}

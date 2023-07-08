@@ -7,3 +7,4 @@ char *get_line(FILE *f);
 int check_exists(char *path, int file);
 void mark_file(char *dir, char *filename);
 int write_to_file(FILE *f, char *line);
+void free_files();
