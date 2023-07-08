@@ -29,6 +29,7 @@ void add_path_to_dir(char *path, dir_t *dir) {
     char *copy;
     int idx;
     while (token) {
+        *(token - 1) = '/';
         if ((idx = path_exists(dir, token)) == -1) {
             copy = malloc(sizeof(char) * (strlen(token) + 1));
             strcpy(copy, token);
