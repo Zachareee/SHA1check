@@ -15,14 +15,13 @@ void append_dir(dir_t *dir, char *name) {
 }
 
 // splits a path string by / and creates a dir_t form listing
-void path_to_dir(char *path, dir_t *dir) {
+void add_path_to_dir(char *path, dir_t *dir) {
     char *token = strtok(path, "/");
     while (token) {
         append_dir(dir, token);
         dir = dir->folder[dir->num - 1];
         token = strtok(NULL, "/");
     }
-    printf("\n");
 }
 
 // iterates through a dir_t

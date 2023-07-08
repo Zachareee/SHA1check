@@ -47,23 +47,30 @@ int main(int argc, char **argv) {
 
     char *line = get_line(hashfile);
     char ptr[PATH_MAX];
+    char *state;
+
     while (line) {
         strcpy(ptr, line);
         free(line);
         int c = compare(dir, ptr);
 
-        if (c != -1) {
-            if (!write_to_file(checkfile, ptr)
-                    || !write_to_file(checkfile, ": ")
-                    || !write_to_file(checkfile,
-                        c ? (c == -2 ? "MISSING\n" : "FAILED\n") : "OK\n")) {
-                printf("Something went wrong while writing to %s\n", dst);
-                return -3;
-            }
-        }
-
-        if (!c) mark_file(dir, ptr);
         line = get_line(hashfile);
+
+        if (c == -1) continue;
+
+        state = "FAILED\n";
+        if (!c) {
+            mark_file(dir, ptr);
+            state = "OK\n";
+        }
+        if (c == -2) state = "MISSING\n";
+
+        strcat(ptr, ": ");
+        strcat(ptr, state);
+        if (!write_to_file(checkfile, ptr)) {
+            printf("Something went wrong while writing to %s\n", dst);
+            return -3;
+        }
     }
 
     fclose(checkfile);
@@ -71,9 +78,11 @@ int main(int argc, char **argv) {
 
     dir_t current = {NULL, NULL, 0};
     append_dir(&current, NULL);
-    path_to_dir(files[0].name, current.folder[0]);
+
+    add_path_to_dir(files[0].name, current.folder[0]);
     dir_iterator(current.folder[0]);
     free(current.folder);
+
     for (int i = 0; i < file_count; i++) {
         //if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
         free(files[i].name);
