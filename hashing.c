@@ -40,7 +40,7 @@ void hexdigest(unsigned char *digest, char *result) {
 
 // returns the hash value of the file
 // returns NULL if run into an error
-char *hash(file_struct file) {
+char *hash(file_struct_t file) {
     // SHA struct init
     unsigned char digest[20];
     EVP_MD_CTX *ctx = EVP_MD_CTX_new();

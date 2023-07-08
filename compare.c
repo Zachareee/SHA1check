@@ -48,7 +48,7 @@ int compare(char *dir, char *line) {
     // construct file_struct to give to hash function
     struct stat s;
     stat(line, &s);
-    file_struct f = {line, s.st_size};
+    file_struct_t f = {line, s.st_size};
     char *hash_value = hash(f);
     int result = strcmp(hash_value, hex);
     printf("OK\n");

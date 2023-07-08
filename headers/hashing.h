@@ -1,3 +1,3 @@
 #include "datatypes.h"
 
-char *hash(file_struct path);
+char *hash(file_struct_t path);

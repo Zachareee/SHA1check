@@ -70,5 +70,4 @@ int main(int argc, char **argv) {
     free(files);
 
     // printf("File count total: %d\n", file_count);
-    free(create_dir());
 }

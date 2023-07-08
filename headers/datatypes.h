@@ -5,11 +5,11 @@ typedef struct {
     char *name;
     size_t size;
     int checked;
-} file_struct;
+} file_struct_t;
 
 typedef struct dir {
     char *name;
-    struct dir *folder;
+    struct dir **folder;
     int contents;
-} dir;
+} dir_t;
 #endif

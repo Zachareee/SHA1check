@@ -8,7 +8,7 @@
 #include "paths.h"
 #define LINELEN 128
 
-file_struct *files = NULL;
+file_struct_t *files = NULL;
 int file_count = 0;
 
 // iterate through directories
@@ -17,13 +17,13 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
     if (type != FTW_F) return 0;
 
     // increase size of array by 1
-    files = realloc(files, (file_count + 1) * sizeof(file_struct));
+    files = realloc(files, (file_count + 1) * sizeof(file_struct_t));
 
     // assign new file in array and increment file counter
     char *name = malloc((sizeof(char) + 1) * strlen(path));
     strcpy(name, path);
     size_t size = sb->st_size;
-    file_struct file = {name, size, 0};
+    file_struct_t file = {name, size, 0};
     files[file_count++] = file;
     return 0;
 }
@@ -55,7 +55,7 @@ int check_exists(char *path, int file) {
     return file ? S_ISREG(s.st_mode) : S_ISDIR(s.st_mode);
 }
 
-// marks a file in the file_struct array as checked
+// marks a file in the file_struct_t array as checked
 void mark_file(char *dir, char *filename) {
     for (int i = 0; i < file_count; i++) {
         if (!strcmp(filename, get_relative_path(dir, files[i].name))) {

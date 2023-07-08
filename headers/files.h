@@ -1,5 +1,5 @@
 #include "datatypes.h"
-extern file_struct *files;
+extern file_struct_t *files;
 extern int file_count;
 
 int loop_files(char *dir);

@@ -1,2 +1,2 @@
 #include "datatypes.h"
-dir *create_dir();
+dir_t *create_dir();
