@@ -7,10 +7,8 @@
 // creates directory with name and appends to dir
 void append_dir(dir_t *dir, char *name) {
     dir->folder = realloc(dir->folder, ++(dir->num) * sizeof(dir_t *));
-    dir_t *new_dir = malloc(sizeof(dir_t));
+    dir_t *new_dir = calloc(1, sizeof(dir_t));
     new_dir->name = name;
-    new_dir->num = 0;
-    new_dir->folder = NULL;
     dir->folder[dir->num - 1] = new_dir;
 }
 
@@ -31,9 +29,9 @@ void add_path_to_dir(char *path, dir_t *dir) {
     char *copy;
     int idx;
     while (token) {
-        copy = malloc(sizeof(char) * (strlen(token) + 1));
-        strcpy(copy, token);
         if ((idx = path_exists(dir, token)) == -1) {
+            copy = malloc(sizeof(char) * (strlen(token) + 1));
+            strcpy(copy, token);
             append_dir(dir, copy);
             dir = dir->folder[dir->num - 1];
             token = strtok(NULL, "/");
@@ -46,17 +44,9 @@ void add_path_to_dir(char *path, dir_t *dir) {
 
 // iterates through a dir_t
 void free_dir(dir_t *dir) {
-    // while (dir && dir->folder) {
-    //     printf("%s\n", dir->name);
-    //     dir_t *temp = dir->folder[0];
-    //     free(dir);
-    //     free(dir->folder);
-    //     dir = temp;
-    // }
-
-    // free(dir);
     if (!dir->num) {
         free(dir->name);
+        free(dir);
         return;
     }
 
@@ -64,6 +54,7 @@ void free_dir(dir_t *dir) {
         free_dir(dir->folder[i]);
     }
 
+    free(dir->folder);
     free(dir->name);
     free(dir);
 }
