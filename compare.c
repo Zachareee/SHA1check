@@ -27,6 +27,8 @@ void trim(char *line, int offset) {
 }
 
 // compare hash of file against recorded hash
+// returns -1 if no hash found, -2 if file not found
+// 0 if hashsum equal and positive if strcmp fails
 int compare(char *dir, char *line) {
     regmatch_t pmatch[1];
     char hex[41];
