@@ -63,10 +63,9 @@ void free_dir(dir_t *dir) {
 
 // write the whole dir struct to checksum file
 void write_dir_to_file(dir_t *dir, int level, FILE *f) {
-    for (int i = 0; i < level; i++) write_to_file(f, "|--");
+    for (int i = 0; i < level; i++) write_to_file(f, "%s", "|--");
     if (level) {
-        write_to_file(f, dir->name);
-        write_to_file(f, "\n");
+        write_to_file(f, "%s\n", dir->name);
     }
     for (int i = 0; i < dir->num; i++) {
         write_dir_to_file(dir->folder[i], level + 1, f);

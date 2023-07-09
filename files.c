@@ -71,12 +71,9 @@ void mark_file(char *dir, char *filename) {
 
 // writes to buffer and flushes to file
 // if successful returns 1
-int write_to_file(FILE *f, char *line) {
-    int count = strlen(line);
-    int write = fwrite(line, sizeof(char), count, f);
+void write_to_file(FILE *f, char *format, void *line) {
+    fprintf(f, format, line);
     fflush(f);
-    if (count != write) printf("Something went wrong while writing\n");
-    return count == write;
 }
 
 void free_files() {
