@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "datatypes.h"
+#include "files.h"
 
 // creates directory with name and appends to dir
 void append_dir(dir_t *dir, char *name) {
@@ -60,10 +61,14 @@ void free_dir(dir_t *dir) {
     free(dir);
 }
 
-void print_dir(dir_t *dir, int level) {
-    for (int i = 0; i < level; i++) printf("|--");
-    if (level) printf("%s\n", dir->name);
+// write the whole dir struct to checksum file
+void write_dir_to_file(dir_t *dir, int level, FILE *f) {
+    for (int i = 0; i < level; i++) write_to_file(f, "|--");
+    if (level) {
+        write_to_file(f, dir->name);
+        write_to_file(f, "\n");
+    }
     for (int i = 0; i < dir->num; i++) {
-        print_dir(dir->folder[i], level + 1);
+        write_dir_to_file(dir->folder[i], level + 1, f);
     }
 }

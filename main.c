@@ -81,7 +81,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    fclose(checkfile);
     fclose(hashfile);
 
     for (int i = 0; i < file_count; i++) {
@@ -89,12 +88,11 @@ int main(int argc, char **argv) {
             add_path_to_dir(get_relative_path(dir, files[i].name), extra);
     }
 
-    printf("Missing:\n");
-    print_dir(missing, 0);
-    printf("Failed:\n");
-    print_dir(failed, 0);
-    printf("Extra:\n");
-    print_dir(extra, 0);
+    write_dir_to_file(missing, 0, checkfile);
+    write_dir_to_file(failed, 0, checkfile);
+    write_dir_to_file(extra, 0, checkfile);
+
+    fclose(checkfile);
 
     free_dir(missing);
     free_dir(failed);
