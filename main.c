@@ -49,7 +49,9 @@ int main(int argc, char **argv) {
     char ptr[PATH_MAX];
     char *state;
 
-    dir_t *current = calloc(1, sizeof(dir_t));
+    dir_t *missing = calloc(1, sizeof(dir_t));
+    dir_t *failed = calloc(1, sizeof(dir_t));
+    dir_t *extra = calloc(1, sizeof(dir_t));
 
     while (line) {
         strcpy(ptr, line);
@@ -60,18 +62,21 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
-        add_path_to_dir(ptr, current);
-        state = "FAILED\n";
-        if (!c) {
-            mark_file(dir, ptr);
-            state = "OK\n";
+        mark_file(dir, ptr);
+        if (!c) state = "OK\n";
+        else {
+            add_path_to_dir(ptr, failed);
+            state = "FAILED\n";
         }
-        if (c == -2) state = "MISSING\n";
+
+        if (c == -2) {
+            add_path_to_dir(ptr, missing);
+            state = "MISSING\n";
+        }
 
         strcat(ptr, ": ");
         strcat(ptr, state);
         if (!write_to_file(checkfile, ptr)) {
-            printf("Something went wrong while writing to %s\n", dst);
             return -3;
         }
     }
@@ -79,13 +84,21 @@ int main(int argc, char **argv) {
     fclose(checkfile);
     fclose(hashfile);
 
-    print_dir(current, 0);
-
     for (int i = 0; i < file_count; i++) {
-        //if (files[i].checked) printf("Debug: %s checked\n", files[i].name);
+        if (!files[i].checked)
+            add_path_to_dir(get_relative_path(dir, files[i].name), extra);
     }
 
-    free_dir(current);
+    printf("Missing:\n");
+    print_dir(missing, 0);
+    printf("Failed:\n");
+    print_dir(failed, 0);
+    printf("Extra:\n");
+    print_dir(extra, 0);
+
+    free_dir(missing);
+    free_dir(failed);
+    free_dir(extra);
     free_files();
 
     // printf("File count total: %d\n", file_count);

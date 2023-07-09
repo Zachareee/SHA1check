@@ -75,6 +75,7 @@ int write_to_file(FILE *f, char *line) {
     int count = strlen(line);
     int write = fwrite(line, sizeof(char), count, f);
     fflush(f);
+    if (count != write) printf("Something went wrong while writing\n");
     return count == write;
 }
 
