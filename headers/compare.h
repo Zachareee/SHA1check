@@ -1,2 +1,2 @@
-void get_line(FILE *f);
-int compare_all(char *dir, char *src);
+int compare(char *dir, char *line);
+int comp_init();

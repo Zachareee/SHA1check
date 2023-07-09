@@ -1,12 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include <limits.h>
 
-int parse_args(int argc, char **argv, char **src,
-        char **dst, char **dir) {
+#include "paths.h"
+
+int parse_args(int argc, char **argv, char *src,
+        char *dst, char *dir) {
     // if no arguments return
     if (argc < 2) {
-        printf("Usage: ./SHA1Hash DIRECTORY\n");
+        printf("Usage: %s DIRECTORY\n", argv[0]);
         return -1;
     }
 
@@ -61,7 +64,7 @@ int parse_args(int argc, char **argv, char **src,
 
         // if directory not in arguments
         if (optind == argc) {
-            printf("Usage: ./SHA1Hash DIRECTORY\n");
+            printf("Usage: %s DIRECTORY\n", argv[0]);
             return -1;
         }
 
@@ -70,8 +73,8 @@ int parse_args(int argc, char **argv, char **src,
         else directory = argv[optind];
     }
 
-    *src = source;
-    *dst = destination;
-    *dir = getcwd(directory, PATH_MAX);
+    strcpy(src, source);
+    strcpy(dst, destination);
+    realpath(directory, dir);
     return 0;
 }

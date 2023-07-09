@@ -5,12 +5,6 @@
 #include "datatypes.h"
 #define CHUNK 65536
 
-//struct cleanup_hashing {
-//    char *result;
-//};
-//
-//struct cleanup_hashing cleanup;
-
 char byte_to_hex(char b) {
     switch (b) {
         case 10:
@@ -46,7 +40,7 @@ void hexdigest(unsigned char *digest, char *result) {
 
 // returns the hash value of the file
 // returns NULL if run into an error
-char *hash(file_struct file) {
+char *hash(file_struct_t file) {
     // SHA struct init
     unsigned char digest[20];
     EVP_MD_CTX *ctx = EVP_MD_CTX_new();
@@ -66,11 +60,13 @@ char *hash(file_struct file) {
         EVP_DigestUpdate(ctx, buffer, size);
     }
 
-    // close file
     fclose(f);
 
-    // retrieve digest and parse to hexadecimal
+    // retrieve digest and free
     EVP_DigestFinal(ctx, digest, NULL);
+    free(ctx);
+
+    // parse to hexadecimal
     char *result = malloc(41 * sizeof(char));
     hexdigest(digest, result);
     result[40] = '\0';
