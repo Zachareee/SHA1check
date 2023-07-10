@@ -45,6 +45,7 @@ int main(int argc, char **argv) {
 
     regex_init();
 
+    init_files(src, dst);
     loop_files(dir);
 
     FILE *hashfile = fopen(src, "r");

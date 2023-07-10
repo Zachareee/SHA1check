@@ -2,6 +2,7 @@
 extern file_struct_t *files;
 extern int file_count;
 
+void init_files(char *src, char *dst);
 void loop_files(char *dir);
 char *get_line(FILE *f);
 int check_exists(char *path, int file);

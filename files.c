@@ -11,10 +11,19 @@
 file_struct_t *files = NULL;
 int file_count = 0;
 
+char *files_src, *files_dst;
+
+// assigns char ptrs
+void init_files(char *src, char *dst) {
+    files_src = src;
+    files_dst = dst;
+}
+
 // iterate through directories
 int file_iterator(const char *path, const struct stat *sb, int type) {
     // return if encounter directory
     if (type != FTW_F) return 0;
+    if (!(strcmp(path, files_src) && strcmp(path, files_dst))) return 0;
 
     // increase size of array by 1
     files = realloc(files, (file_count + 1) * sizeof(file_struct_t));
@@ -31,7 +40,7 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
 void loop_files(char *dir) {
     int status = ftw(dir, &file_iterator, 1);
     if (status) {
-        printf("Something went wrong while detecting the directory\n");
+        printf("Something went wrong while reading the directory\n");
         exit(status);
     }
 }

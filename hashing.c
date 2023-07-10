@@ -3,7 +3,7 @@
 #include <openssl/evp.h>
 
 #include "datatypes.h"
-#define CHUNK 65536
+#define CHUNK 131072
 
 char byte_to_hex(char b) {
     switch (b) {
@@ -36,6 +36,8 @@ void hexdigest(unsigned char *digest, char *result) {
         result[2 * i] = byte_to_hex(top);
         result[2 * i + 1] = byte_to_hex(bot);
     }
+
+    result[40] = '\0';
 }
 
 // returns the hash value of the file
@@ -69,6 +71,5 @@ char *hash(file_struct_t file) {
     // parse to hexadecimal
     char *result = malloc(41 * sizeof(char));
     hexdigest(digest, result);
-    result[40] = '\0';
     return result;
 }
