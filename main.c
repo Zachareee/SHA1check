@@ -10,15 +10,16 @@
 #include "hashing.h"
 #include "paths.h"
 
+dir_t *passed;
 dir_t *missing;
 dir_t *failed;
 dir_t *extra;
 
 void free_all() {
+    if (passed) free_dir(passed);
     if (missing) free_dir(missing);
     if (failed) free_dir(failed);
     if (extra) free_dir(extra);
-    free_files();
     free_regex();
 }
 
@@ -45,9 +46,6 @@ int main(int argc, char **argv) {
 
     regex_init();
 
-    init_files(src, dst);
-    loop_files(dir);
-
     FILE *hashfile = fopen(src, "r");
     FILE *checkfile = fopen(dst, "w");
 
@@ -57,6 +55,7 @@ int main(int argc, char **argv) {
     // 0: OK, 1: MISSING, 2: FAILED, 3: EXTRA
     unsigned int arr[4] = {0};
 
+    passed = calloc(1, sizeof(dir_t));
     missing = calloc(1, sizeof(dir_t));
     failed = calloc(1, sizeof(dir_t));
     extra = calloc(1, sizeof(dir_t));
@@ -70,8 +69,8 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
-        mark_file(dir, ptr);
         if (!c) {
+            add_path_to_dir(ptr, passed);
             state = "OK";
             arr[0]++;
         } else {
@@ -92,12 +91,7 @@ int main(int argc, char **argv) {
 
     fclose(hashfile);
 
-    for (int i = 0; i < file_count; i++) {
-        if (!files[i].checked) {
-            add_path_to_dir(get_relative_path(dir, files[i].name), extra);
-            arr[1]++;
-        }
-    }
+    loop_files(dir, src, dst, passed, failed, extra, arr + 3);
 
     // creates a char array which can hold the number of files as text
     char length[11] = {0};

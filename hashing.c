@@ -42,7 +42,7 @@ void hexdigest(unsigned char *digest, char *result) {
 
 // returns the hash value of the file
 // returns NULL if run into an error
-char *hash(file_struct_t file) {
+char *hash(char *path, size_t size) {
     // SHA struct init
     unsigned char digest[20];
     EVP_MD_CTX *ctx = EVP_MD_CTX_new();
@@ -52,12 +52,12 @@ char *hash(file_struct_t file) {
     }
 
     // try to open file
-    FILE *f = fopen(file.name, "r");
+    FILE *f = fopen(path, "r");
     if (!f) return NULL;
 
     // loops through the whole file
     unsigned char buffer[CHUNK];
-    for (int i = 0; i < file.size; i += CHUNK) {
+    for (int i = 0; i < size; i += CHUNK) {
         size_t size = fread(buffer, 1, CHUNK, f);
         EVP_DigestUpdate(ctx, buffer, size);
     }

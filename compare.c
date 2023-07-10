@@ -1,14 +1,14 @@
+#include <limits.h>
 #include <regex.h>
 #include <stdio.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
 
-#include <files.h>
-#include <hashing.h>
-#include <paths.h>
-#define LINELEN 12
+#include "files.h"
+#include "hashing.h"
+#include "paths.h"
+#define LINELEN 128
 
 regex_t reghex;
 regex_t regws;
@@ -58,11 +58,12 @@ int compare(char *dir, char *line) {
     if (!check_exists(path, 1)) return -2;
 
     fprintf(stderr, "Checking %s...", get_relative_path(dir, path));
+
     // construct file_struct to give to hash function
     struct stat s;
     stat(path, &s);
-    file_struct_t f = {path, s.st_size};
-    char *hash_value = hash(f);
+
+    char *hash_value = hash(path, s.st_size);
     int result = strcmp(hash_value, hex);
     fprintf(stderr, "OK\n");
 
@@ -71,6 +72,7 @@ int compare(char *dir, char *line) {
     return !!result;
 }
 
+// frees regex allocs
 void free_regex() {
     regfree(&reghex);
     regfree(&regws);
