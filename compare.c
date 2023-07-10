@@ -14,7 +14,7 @@ regex_t reghex;
 regex_t regws;
 
 // init regex sequences
-int comp_init() {
+int regex_init() {
     int regh = regcomp(&reghex, "[0-9a-zA-Z]{40}", REG_EXTENDED);
     int regw = regcomp(&regws, "\\s", REG_EXTENDED);
     return regh + regw;
@@ -66,4 +66,9 @@ int compare(char *dir, char *line) {
     // free malloc-ed variables
     free(hash_value);
     return !!result;
+}
+
+void free_regex() {
+    regfree(&reghex);
+    regfree(&regws);
 }

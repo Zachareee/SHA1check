@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    if (comp_init()) {
+    if (regex_init()) {
         printf("Something went wrong while initialising pattern matcher\n");
         return -2;
     }
@@ -109,5 +109,5 @@ int main(int argc, char **argv) {
     free_dir(missing);
     free_dir(failed);
     free_dir(extra);
-    free_files();
+    free_all();
 }

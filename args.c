@@ -78,3 +78,8 @@ int parse_args(int argc, char **argv, char *src,
     realpath(directory, dir);
     return 0;
 }
+
+void free_all() {
+    free_files();
+    free_regex();
+}
