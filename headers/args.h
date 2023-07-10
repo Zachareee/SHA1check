@@ -1,4 +1,3 @@
 #include "datatypes.h"
 
-int parse_args(int argc, char **argv, char *src, char *dst, char *dir);
-void free_all();
+void parse_args(int argc, char **argv, char *src, char *dst, char *dir);

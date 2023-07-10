@@ -14,10 +14,13 @@ regex_t reghex;
 regex_t regws;
 
 // init regex sequences
-int regex_init() {
+void regex_init() {
     int regh = regcomp(&reghex, "[0-9a-zA-Z]{40}", REG_EXTENDED);
     int regw = regcomp(&regws, "\\s", REG_EXTENDED);
-    return regh + regw;
+    if (regh || regw) {
+        printf("Something went wrong while initialising pattern matcher\n");
+        exit(-2);
+    }
 }
 
 // returns 1 if whitespace character is matched

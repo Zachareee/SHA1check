@@ -28,8 +28,12 @@ int file_iterator(const char *path, const struct stat *sb, int type) {
     return 0;
 }
 
-int loop_files(char *dir) {
-    return ftw(dir, &file_iterator, 1);
+void loop_files(char *dir) {
+    int status = ftw(dir, &file_iterator, 1);
+    if (status) {
+        printf("Something went wrong while detecting the directory\n");
+        exit(status);
+    }
 }
 
 // mallocs a line read from file
