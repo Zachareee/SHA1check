@@ -75,7 +75,7 @@ void mark_file(char *dir, char *filename) {
 
 // writes to buffer and flushes to file
 // if successful returns 1
-void write_to_file(FILE *f, char *format, void *line) {
+void write_to_file(FILE *f, char *format, char *line) {
     fprintf(f, format, line);
     fflush(f);
 }
