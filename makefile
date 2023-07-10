@@ -1,12 +1,12 @@
 CC=clang
 CF=$(CFLAGS)
 CFLAGS=-c -Wall -I headers
-CFLAGSS=-c -Wall -fsanitize=address -I headers
+CFLAGSS=-c -Wall -I headers
 OBJECTS=args.o compare.o dir.o files.o hashing.o paths.o main.o
-all: prog clean run
+all: prog clean
 
 prog: $(OBJECTS)
-	$(CC) $(OBJECTS) -lcrypto -fsanitize=address -o main
+	$(CC) $(OBJECTS) -lcrypto -o main
 
 args.o:args.c
 	$(CC) $(CF) args.c

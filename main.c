@@ -96,13 +96,13 @@ int main(int argc, char **argv) {
     write_to_file(checkfile, "\n%d files OK\n\n", arr[0]);
 
     write_to_file(checkfile, "%d files were not found in the hashfile:\n", arr[3]);
-    write_dir_to_file(missing, 0, checkfile);
+    write_dir_to_file(extra, 0, checkfile);
 
     write_to_file(checkfile, "\n%d files failed hashsum checks:\n", arr[2]);
     write_dir_to_file(failed, 0, checkfile);
 
     write_to_file(checkfile, "\n%d files could not be found:\n", arr[1]);
-    write_dir_to_file(extra, 0, checkfile);
+    write_dir_to_file(missing, 0, checkfile);
 
     fclose(checkfile);
 

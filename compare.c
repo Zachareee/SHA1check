@@ -20,9 +20,14 @@ int comp_init() {
     return regh + regw;
 }
 
+// returns 1 if whitespace character is matched
+int whitespace(char *ptr) {
+    return !regexec(&regws, ptr, 0, NULL, 0);
+}
+
 // trim trailing whitespaces in the line
 void trim(char *line, int offset) {
-    for (int i = offset - 1; line[i] == ' '; i--) {
+    for (int i = offset - 1; whitespace(line); i--) {
         line[i] = 0;
     }
 }
@@ -56,7 +61,7 @@ int compare(char *dir, char *line) {
     file_struct_t f = {path, s.st_size};
     char *hash_value = hash(f);
     int result = strcmp(hash_value, hex);
-    printf("OK\n");
+    fprintf(stderr, "OK\n");
 
     // free malloc-ed variables
     free(hash_value);
