@@ -5,31 +5,50 @@
 #include <unistd.h>
 
 #include "datatypes.h"
+#include "dir.h"
 #include "paths.h"
 #define LINELEN 128
 
-file_struct_t *files = NULL;
-int file_count = 0;
+char *files_dir, *files_src, *files_dst;
+dir_t *files_pass, *files_fail, *files_extra;
+unsigned int *num;
 
-// iterate through directories
+// iterate through directories, path is absolute path
 int file_iterator(const char *path, const struct stat *sb, int type) {
     // return if encounter directory
     if (type != FTW_F) return 0;
 
-    // increase size of array by 1
-    files = realloc(files, (file_count + 1) * sizeof(file_struct_t));
+    // if file is src or dst return
+    if (!(strcmp(path, files_src) && strcmp(path, files_dst))) return 0;
 
-    // assign new file in array and increment file counter
-    char *name = malloc((sizeof(char) + 1) * strlen(path));
-    strcpy(name, path);
-    size_t size = sb->st_size;
-    file_struct_t file = {name, size, 0};
-    files[file_count++] = file;
+    // if file not in hashfile, add path to dir
+    char *short_path = get_relative_path(files_dir, (char *)path);
+    if (path_exists(files_pass, short_path) == 0
+            && path_exists(files_fail, short_path) == 0) {
+        char copy[strlen(short_path) + 1];
+        strcpy(copy, short_path);
+        add_path_to_dir(copy, files_extra);
+        (*num)++;
+    }
+
     return 0;
 }
 
-int loop_files(char *dir) {
-    return ftw(dir, &file_iterator, 1);
+void loop_files(char *dir, char *src, char *dst,
+        dir_t *pass, dir_t *fail, dir_t *extra, unsigned int *count) {
+    files_dir = dir;
+    files_src = src;
+    files_dst = dst;
+    files_pass = pass;
+    files_fail = fail;
+    files_extra = extra;
+    num = count;
+
+    int status = ftw(dir, &file_iterator, 1);
+    if (status) {
+        printf("Something went wrong while reading the directory\n");
+        exit(status);
+    }
 }
 
 // mallocs a line read from file
@@ -49,7 +68,7 @@ char *get_line(FILE *f) {
     return NULL;
 }
 
-// checks if path exists as d: dir or f: file
+// checks if path exists as file: 1 or dir: 0
 int check_exists(char *path, int file) {
     struct stat s;
     if (stat(path, &s)) {
@@ -59,25 +78,9 @@ int check_exists(char *path, int file) {
     return file ? S_ISREG(s.st_mode) : S_ISDIR(s.st_mode);
 }
 
-// marks a file in the file_struct_t array as checked
-void mark_file(char *dir, char *filename) {
-    for (int i = 0; i < file_count; i++) {
-        if (!strcmp(filename, get_relative_path(dir, files[i].name))) {
-            files[i].checked = 1;
-            return;
-        }
-    }
-}
-
 // writes to buffer and flushes to file
 // if successful returns 1
-void write_to_file(FILE *f, char *format, void *line) {
+void write_to_file(FILE *f, char *format, char *line) {
     fprintf(f, format, line);
     fflush(f);
-}
-
-void free_files() {
-    for (int i = 0; i < file_count; i++)
-        free(files[i].name);
-    free(files);
 }

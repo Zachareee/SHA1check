@@ -5,12 +5,12 @@
 
 #include "paths.h"
 
-int parse_args(int argc, char **argv, char *src,
+void parse_args(int argc, char **argv, char *src,
         char *dst, char *dir) {
     // if no arguments return
     if (argc < 2) {
-        printf("Usage: %s DIRECTORY\n", argv[0]);
-        return -1;
+        printf("Usage: %s DIRECTORY", argv[0]);
+        exit(-1);
     }
 
     /* if directory is second arg set var
@@ -33,18 +33,18 @@ int parse_args(int argc, char **argv, char *src,
             // return if value is missing
             case ':':
                 printf("Missing value for -%c\n", argv[optind - 2][1]);
-                return -1;
+                exit(-1);
                 // return if unknown option
             case '?':
                 printf("Unknown option: -%c\n", optopt);
-                return -1;
+                exit(-1);
             case 'd':
             case 's':
                 // return if value starts with ':'
                 if (optarg[0] == '-') {
                     printf("Invalid value for -%c: %s\n",
                             argv[optind - 2][1], optarg);
-                    return -1;
+                    exit(-1);
                 }
 
                 // assign values
@@ -65,7 +65,7 @@ int parse_args(int argc, char **argv, char *src,
         // if directory not in arguments
         if (optind == argc) {
             printf("Usage: %s DIRECTORY\n", argv[0]);
-            return -1;
+            exit(-1);
         }
 
         // assigns directory using optind
@@ -76,5 +76,4 @@ int parse_args(int argc, char **argv, char *src,
     strcpy(src, source);
     strcpy(dst, destination);
     realpath(directory, dir);
-    return 0;
 }

@@ -10,14 +10,26 @@
 #include "hashing.h"
 #include "paths.h"
 
+dir_t *passed;
+dir_t *missing;
+dir_t *failed;
+dir_t *extra;
+
+void free_all() {
+    if (passed) free_dir(passed);
+    if (missing) free_dir(missing);
+    if (failed) free_dir(failed);
+    if (extra) free_dir(extra);
+    free_regex();
+}
+
 int main(int argc, char **argv) {
+    atexit(free_all);
     char src[PATH_MAX];
     char dst[PATH_MAX];
     char dir[PATH_MAX];
 
-    // if parse_args returns -1 exit program
-    int exit;
-    if ((exit = parse_args(argc, argv, src, dst, dir))) return exit;
+    parse_args(argc, argv, src, dst, dir);
 
     // checks if file exists
     concat_path(dir, src);
@@ -32,15 +44,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    if (comp_init()) {
-        printf("Something went wrong while initialising pattern matcher\n");
-        return -2;
-    }
-
-    if ((exit = loop_files(dir))) {
-        printf("Something went wrong while detecting the directory\n");
-        return exit;
-    }
+    regex_init();
 
     FILE *hashfile = fopen(src, "r");
     FILE *checkfile = fopen(dst, "w");
@@ -49,11 +53,12 @@ int main(int argc, char **argv) {
     char ptr[PATH_MAX];
     char *state;
     // 0: OK, 1: MISSING, 2: FAILED, 3: EXTRA
-    int arr[4] = {0};
+    unsigned int arr[4] = {0};
 
-    dir_t *missing = calloc(1, sizeof(dir_t));
-    dir_t *failed = calloc(1, sizeof(dir_t));
-    dir_t *extra = calloc(1, sizeof(dir_t));
+    passed = calloc(1, sizeof(dir_t));
+    missing = calloc(1, sizeof(dir_t));
+    failed = calloc(1, sizeof(dir_t));
+    extra = calloc(1, sizeof(dir_t));
 
     while (line) {
         strcpy(ptr, line);
@@ -64,8 +69,8 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
-        mark_file(dir, ptr);
         if (!c) {
+            add_path_to_dir(ptr, passed);
             state = "OK";
             arr[0]++;
         } else {
@@ -86,28 +91,25 @@ int main(int argc, char **argv) {
 
     fclose(hashfile);
 
-    for (int i = 0; i < file_count; i++) {
-        if (!files[i].checked) {
-            add_path_to_dir(get_relative_path(dir, files[i].name), extra);
-            arr[1]++;
-        }
-    }
+    loop_files(dir, src, dst, passed, failed, extra, arr + 3);
 
-    write_to_file(checkfile, "\n%d files OK\n\n", arr[0]);
+    // creates a char array which can hold the number of files as text
+    char length[11] = {0};
 
-    write_to_file(checkfile, "%d files were not found in the hashfile:\n", arr[3]);
-    write_dir_to_file(missing, 0, checkfile);
+    snprintf(length, 10, "%d", arr[0]);
+    write_to_file(checkfile, "\n%s files OK\n", length);
 
-    write_to_file(checkfile, "\n%d files failed hashsum checks:\n", arr[2]);
-    write_dir_to_file(failed, 0, checkfile);
-
-    write_to_file(checkfile, "\n%d files could not be found:\n", arr[1]);
+    snprintf(length, 10, "%d", arr[3]);
+    write_to_file(checkfile, "\n%s files were not found in the hashfile:\n", length);
     write_dir_to_file(extra, 0, checkfile);
 
-    fclose(checkfile);
+    snprintf(length, 10, "%d", arr[2]);
+    write_to_file(checkfile, "\n%s files failed hashsum checks:\n", length);
+    write_dir_to_file(failed, 0, checkfile);
 
-    free_dir(missing);
-    free_dir(failed);
-    free_dir(extra);
-    free_files();
+    snprintf(length, 10, "%d", arr[1]);
+    write_to_file(checkfile, "\n%s files could not be found:\n", length);
+    write_dir_to_file(missing, 0, checkfile);
+
+    fclose(checkfile);
 }
