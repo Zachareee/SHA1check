@@ -1,7 +1,9 @@
-#include <ftw.h>
+#include <dirent.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include "datatypes.h"
@@ -9,17 +11,33 @@
 #include "paths.h"
 #define LINELEN 128
 
-char *files_dir, *files_src, *files_dst;
-dir_t *files_pass, *files_fail, *files_extra;
-unsigned int *num;
-
 // iterate through directories, path is absolute path
-int file_iterator(const char *path, const struct stat *sb, int type) {
-    // return if encounter directory
-    if (type != FTW_F) return 0;
+int file_iterator(char *dir, char *src, char *dst,
+        dir_t *pass, dir_t *fail, dir_t *extra, unsigned int *count) {
+    DIR *dirobj;
+    struct dirent *entry;
 
-    // if file is src or dst return
-    if (!(strcmp(path, files_src) && strcmp(path, files_dst))) return 0;
+    if (!(dirobj = opendir(dir))) {
+        printf("Something went wrong while reading the directory\n");
+        exit(-4);
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        // if file is src or dst return
+        if (!(strcmp(path, files_src) && strcmp(path, files_dst))) return 0;
+        if (entry->d_type == DT_DIR) {
+            char path[PATH_LIMIT];
+            if (strcmp(entry->d_name, dir) == 0 || strcmp(entry->d_name, "..") == 0)
+                continue;
+            snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
+            printf("%*s[%s]\n", indent, "", entry->d_name);
+            listdir(path, indent + 2);
+        } else {
+            printf("%*s- %s\n", indent, "", entry->d_name);
+        }
+    }
+
+    closedir(dir);
 
     // if file not in hashfile, add path to dir
     char *short_path = get_relative_path(files_dir, (char *)path);
@@ -45,10 +63,6 @@ void loop_files(char *dir, char *src, char *dst,
     num = count;
 
     int status = ftw(dir, &file_iterator, 1);
-    if (status) {
-        printf("Something went wrong while reading the directory\n");
-        exit(status);
-    }
 }
 
 // mallocs a line read from file
