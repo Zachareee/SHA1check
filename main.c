@@ -90,12 +90,9 @@ int main(int argc, char **argv) {
     }
 
     fclose(hashfile);
-    fclose(checkfile);
 
     file_iterator(dir, src, dst, passed, failed, extra, arr + 3);
 
-    checkfile = fopen(dst, "w");
-    printf("I'm here\n");
     // creates a char array which can hold the number of files as text
     char length[11] = {0};
 

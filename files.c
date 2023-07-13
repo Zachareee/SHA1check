@@ -16,26 +16,20 @@ dir_t *pass, *fail, *extra;
 char *dirs, *src, *dst;
 unsigned int *count;
 
-void listdir(char *parent, char *child, DIR **dir) {
-    long loc = telldir(*dir);
-    closedir(*dir);
+void listdir(char *name) {
+    DIR *dir;
     struct dirent *entry;
 
-    if (!(*dir = opendir(child))) {
-        *dir = opendir(parent);
-        seekdir(*dir, loc);
-        return;
-    }
+    if (!(dir = opendir(name))) return;
 
-    while ((entry = readdir(*dir))) {
-        printf("%ld\n", telldir(*dir));
+    while ((entry = readdir(dir))) {
         char path[PATH_MAX];
-        snprintf(path, sizeof(path), "%s/%s", child, entry->d_name);
+        snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
         if (entry->d_type == DT_DIR) {
             if (!strcmp(entry->d_name, ".") ||
                     !strcmp(entry->d_name, "..")) continue;
 
-            listdir(child, path, dir);
+            listdir(path);
         } else {
             // if file is src or dst continue
             if (!(strcmp(entry->d_name, src) && strcmp(entry->d_name, dst))) continue;
@@ -52,8 +46,7 @@ void listdir(char *parent, char *child, DIR **dir) {
         }
     }
 
-    *dir = opendir(parent);
-    seekdir(*dir, loc);
+    closedir(dir);
 }
 
 // iterate through directories, path is absolute path
@@ -76,14 +69,13 @@ void file_iterator(char *dirl, char *srcl, char *dstl,
     }
 
     while ((entry = readdir(dir))) {
-        printf("%ld\n", telldir(dir));
         char path[PATH_MAX];
         snprintf(path, sizeof(path), "%s/%s", dirl, entry->d_name);
         if (entry->d_type == DT_DIR) {
             if (!strcmp(entry->d_name, ".") ||
                     !strcmp(entry->d_name, "..")) continue;
 
-            listdir(dirl, path, &dir);
+            listdir(dirl);
         } else {
             // if file is src or dst continue
             if (!(strcmp(entry->d_name, src) && strcmp(entry->d_name, dst))) continue;
@@ -99,6 +91,8 @@ void file_iterator(char *dirl, char *srcl, char *dstl,
             }
         }
     }
+
+    closedir(dir);
 }
 
 // mallocs a line read from file
