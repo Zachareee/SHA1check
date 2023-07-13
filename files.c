@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include "datatypes.h"
@@ -11,58 +12,93 @@
 #include "paths.h"
 #define LINELEN 128
 
-// iterate through directories, path is absolute path
-int file_iterator(char *dir, char *src, char *dst,
-        dir_t *pass, dir_t *fail, dir_t *extra, unsigned int *count) {
-    DIR *dirobj;
+dir_t *pass, *fail, *extra;
+char *dirs, *src, *dst;
+unsigned int *count;
+
+void listdir(char *parent, char *child, DIR **dir) {
+    long loc = telldir(*dir);
+    closedir(*dir);
     struct dirent *entry;
 
-    if (!(dirobj = opendir(dir))) {
+    if (!(*dir = opendir(child))) {
+        *dir = opendir(parent);
+        seekdir(*dir, loc);
+        return;
+    }
+
+    while ((entry = readdir(*dir))) {
+        printf("%ld\n", telldir(*dir));
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", child, entry->d_name);
+        if (entry->d_type == DT_DIR) {
+            if (!strcmp(entry->d_name, ".") ||
+                    !strcmp(entry->d_name, "..")) continue;
+
+            listdir(child, path, dir);
+        } else {
+            // if file is src or dst continue
+            if (!(strcmp(entry->d_name, src) && strcmp(entry->d_name, dst))) continue;
+
+            // if file not in hashfile, add path to dir
+            char *short_path = get_relative_path(dirs, path);
+            if (path_exists(pass, short_path) == 0
+                    && path_exists(fail, short_path) == 0) {
+                char copy[strlen(short_path) + 1];
+                strcpy(copy, short_path);
+                add_path_to_dir(copy, extra);
+                (*count)++;
+            }
+        }
+    }
+
+    *dir = opendir(parent);
+    seekdir(*dir, loc);
+}
+
+// iterate through directories, path is absolute path
+void file_iterator(char *dirl, char *srcl, char *dstl,
+        dir_t *passl, dir_t *faill, dir_t *extral, unsigned int *countl) {
+    pass = passl;
+    fail = faill;
+    extra = extral;
+    dirs = dirl;
+    src = srcl;
+    dst = dstl;
+    count = countl;
+
+    DIR *dir;
+    struct dirent *entry;
+
+    if (!(dir = opendir(dirl))) {
         printf("Something went wrong while reading the directory\n");
         exit(-4);
     }
 
-    while ((entry = readdir(dir)) != NULL) {
-        // if file is src or dst return
-        if (!(strcmp(path, files_src) && strcmp(path, files_dst))) return 0;
+    while ((entry = readdir(dir))) {
+        printf("%ld\n", telldir(dir));
+        char path[PATH_MAX];
+        snprintf(path, sizeof(path), "%s/%s", dirl, entry->d_name);
         if (entry->d_type == DT_DIR) {
-            char path[PATH_LIMIT];
-            if (strcmp(entry->d_name, dir) == 0 || strcmp(entry->d_name, "..") == 0)
-                continue;
-            snprintf(path, sizeof(path), "%s/%s", name, entry->d_name);
-            printf("%*s[%s]\n", indent, "", entry->d_name);
-            listdir(path, indent + 2);
+            if (!strcmp(entry->d_name, ".") ||
+                    !strcmp(entry->d_name, "..")) continue;
+
+            listdir(dirl, path, &dir);
         } else {
-            printf("%*s- %s\n", indent, "", entry->d_name);
+            // if file is src or dst continue
+            if (!(strcmp(entry->d_name, src) && strcmp(entry->d_name, dst))) continue;
+
+            // if file not in hashfile, add path to dir
+            char *short_path = get_relative_path(dirs, path);
+            if (path_exists(pass, short_path) == 0
+                    && path_exists(fail, short_path) == 0) {
+                char copy[strlen(short_path) + 1];
+                strcpy(copy, short_path);
+                add_path_to_dir(copy, extra);
+                (*count)++;
+            }
         }
     }
-
-    closedir(dir);
-
-    // if file not in hashfile, add path to dir
-    char *short_path = get_relative_path(files_dir, (char *)path);
-    if (path_exists(files_pass, short_path) == 0
-            && path_exists(files_fail, short_path) == 0) {
-        char copy[strlen(short_path) + 1];
-        strcpy(copy, short_path);
-        add_path_to_dir(copy, files_extra);
-        (*num)++;
-    }
-
-    return 0;
-}
-
-void loop_files(char *dir, char *src, char *dst,
-        dir_t *pass, dir_t *fail, dir_t *extra, unsigned int *count) {
-    files_dir = dir;
-    files_src = src;
-    files_dst = dst;
-    files_pass = pass;
-    files_fail = fail;
-    files_extra = extra;
-    num = count;
-
-    int status = ftw(dir, &file_iterator, 1);
 }
 
 // mallocs a line read from file

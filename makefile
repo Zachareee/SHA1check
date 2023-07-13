@@ -1,12 +1,12 @@
 CC=clang
-CF=$(CFLAGS)
+CF=$(CFLAGSD)
 CFLAGS=-c -Wall --optimize -I headers
 CFLAGSD=-c -Wall -g -fsanitize=address -I headers
 OBJECTS=args.o compare.o dir.o files.o hashing.o paths.o main.o
 all: prog clean
 
 prog: $(OBJECTS)
-	$(CC) $(OBJECTS) --optimize -lcrypto -o main
+	$(CC) $(OBJECTS) -g -fsanitize=address -lcrypto -o main
 
 args.o:args.c
 	$(CC) $(CF) args.c
