@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <sys/syscall.h>
 
-#define BUF_SIZE 128
+#define BUF_SIZE 1024
 #include "datatypes.h"
 #include "dir.h"
 #include "paths.h"
@@ -42,6 +42,8 @@ int getdent(char *name) {
                 getdent(path);
             } else {
                 if (!strcmp(path, src) || !strcmp(path, dst)) continue;
+                if (path_exists(pass, get_relative_path(dir, path))
+                        || path_exists(fail, get_relative_path(dir, path))) continue;
 
                 add_path_to_dir(get_relative_path(dir, path) , extras);
                 (*count)++;
