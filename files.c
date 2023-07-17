@@ -42,6 +42,10 @@ int check_exists(char *path, int file) {
 // writes to buffer and flushes to file
 // if successful returns 1
 void write_to_file(FILE *f, char *format, char *line) {
-    fprintf(f, format, line);
+    int len = fprintf(f, format, line);
+    if (!len) {
+        printf("Something went wrong while writing to the file");
+        exit(-3);
+    }
     fflush(f);
 }

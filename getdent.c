@@ -16,6 +16,7 @@ dir_t *pass, *fail, *extras;
 char *dir, *src, *dst;
 unsigned int *count;
 
+// recursive function to get directories
 int getdent(char *name) {
     int fd, nread;
     char buf[BUF_SIZE];
