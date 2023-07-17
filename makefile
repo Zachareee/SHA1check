@@ -1,9 +1,10 @@
 CC=clang
 CF=-c -Wall --optimize -I headers
 CFD=-c -Wall -g -fsanitize=address -I headers
-OBJECTS=args.o compare.o dir.o files.o getdent.o hashing.o paths.o main.o
-DBGOBJ=args-debug.o compare-debug.o dir-debug.o files-debug.o getdent-debug.o hashing-debug.o paths-debug.o main-debug.o
-SOURCE=args.c compare.c dir.c files.c getdent.c hashing.c paths.c main.c
+NAMES=args compare dir files getdent hashing paths main
+SRC=$(foreach name,$(NAMES),$(name).c)
+OBJECTS=$(foreach name,$(NAMES),$(name).o)
+DBGOBJ=$(foreach name,$(NAMES),$(name)-debug.o)
 
 all: prog clean
 
@@ -12,34 +13,44 @@ prog: $(OBJECTS)
 
 debug: prog-debug clean
 
-prog-debug: $(SOURCE)
-	foreach src, $(SOURCE), $(echo $(src))
-	#$(CC) $(SOURCE) -g -fsanitize=address -o $(SOURCE)-debug.o))
-	$(CC) $(DBGOBJ) -g -fsanitize=address -lcrypto -o main
+prog-debug: $(DBGOBJ)
+	$(CC) $(DBGOBJ) -g -fsanitize=address -lcrypto -o main-debug
 
-args.o:args.c
-	$(CC) $(CF) args.c
+$(DBGOBJ): $(SRC)
+	@for file in $(SRC); do \
+		$(CC) $(CFD) $$file -o $${file%.c}-debug.o; \
+		echo $${file%.c} compiled; \
+	done
 
-compare.o:compare.c
-	$(CC) $(CF) compare.c
+$(OBJECTS): $(SRC)
+	@for file in $(SRC); do \
+		$(CC) $(CF) $$file -o $${file%.c}.o; \
+		echo $${file} compiled; \
+	done
 
-dir.o:dir.c
-	$(CC) $(CF) dir.c
-
-files.o:files.c
-	$(CC) $(CF) files.c
-
-getdent.o:getdent.c
-	$(CC) $(CF) getdent.c
-
-hashing.o:hashing.c
-	$(CC) $(CF) hashing.c
-
-paths.o:paths.c
-	$(CC) $(CF) paths.c
-
-main.o:main.c
-	$(CC) $(CF) main.c
+#args.o:args.c
+#	$(CC) $(CF) args.c
+#
+#compare.o:compare.c
+#	$(CC) $(CF) compare.c
+#
+#dir.o:dir.c
+#	$(CC) $(CF) dir.c
+#
+#files.o:files.c
+#	$(CC) $(CF) files.c
+#
+#getdent.o:getdent.c
+#	$(CC) $(CF) getdent.c
+#
+#hashing.o:hashing.c
+#	$(CC) $(CF) hashing.c
+#
+#paths.o:paths.c
+#	$(CC) $(CF) paths.c
+#
+#main.o:main.c
+#	$(CC) $(CF) main.c
 
 clean:
 	rm -rf *.o

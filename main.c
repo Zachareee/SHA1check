@@ -31,9 +31,8 @@ int main(int argc, char **argv) {
 
     parse_args(argc, argv, src, dst, dir);
 
+    printf("%s\n", dst);
     // checks if file exists
-    concat_path(dir, src);
-    concat_path(dir, dst);
     if (!check_exists(dir, 0)) {
         printf("%s is not a directory\n", dir);
         return -1;

@@ -9,7 +9,7 @@ void parse_args(int argc, char **argv, char *src,
         char *dst, char *dir) {
     // if no arguments return
     if (argc < 2) {
-        printf("Usage: %s DIRECTORY", argv[0]);
+        printf("Usage: %s DIRECTORY\n", argv[0]);
         exit(-1);
     }
 
@@ -73,7 +73,19 @@ void parse_args(int argc, char **argv, char *src,
         else directory = argv[optind];
     }
 
-    strcpy(src, source);
-    strcpy(dst, destination);
-    realpath(directory, dir);
+    // realpath(directory, dir); // uncomment for testing
+    strcpy(dir, directory); // uncomment for production
+
+    if (source[0] == ':') strcpy(src, source + 1);
+    else {
+        strcpy(src, source);
+        concat_path(directory, src);
+    }
+
+    if (destination[0] == ':') strcpy(dst, destination + 1);
+    else {
+        printf("Alt path\n");
+        strcpy(dst, destination);
+        concat_path(directory, dst);
+    }
 }
