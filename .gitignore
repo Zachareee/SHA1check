@@ -1,0 +1,5 @@
+main*
+hashes.sha1
+*.swp
+checksum.txt
+*.o
