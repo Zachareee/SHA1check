@@ -53,7 +53,7 @@
 error:                                                                          \
     printf("Something went wrong while reading the directory\n");               \
     exit(-4);                                                                   \
-}                                                                               \
+}
 
 #endif
 
@@ -74,7 +74,7 @@ error:                                                                          
                                                                                 \
 void looper(char *name) {                                                       \
     nftw(name, &loop_files, 1, FTW_PHYS);                                       \
-}                                                                               \
+}
 
 #endif
 
