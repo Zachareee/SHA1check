@@ -10,7 +10,7 @@
 
 #ifdef __unix__
 #define BUF_SIZE 1024
-#define getdent __getdent_linux(name) {                                         \
+#define define_func void getdent(char *name) {                                  \
     int fd, nread;                                                              \
     char buf[BUF_SIZE];                                                         \
     struct linux_dirent *d;                                                     \
@@ -60,6 +60,21 @@ error:                                                                          
 #ifdef __APPLE__
 
 #define getdent looper
+#define define_func int loop_files(const char *path, const struct stat *sb,     \
+        int type, struct FTW* buf) {                                            \
+    if (type != FTW_F) return 0;                                                \
+                                                                                \
+    if (path_exists(pass, get_relative_path(dir, (char *)path))                 \
+            || path_exists(fail, get_relative_path(dir, (char *)path)))         \
+        return 0;                                                               \
+    add_path_to_dir(get_relative_path(dir, (char *)path) , extras);             \
+    (*count)++;                                                                 \
+    return 0;                                                                   \
+}                                                                               \
+                                                                                \
+void looper(char *name) {                                                       \
+    nftw(name, &loop_files, 1, FTW_PHYS);                                       \
+}                                                                               \
 
 #endif
 
@@ -71,23 +86,7 @@ dir_t *pass, *fail, *extras;
 char *dir, *src, *dst;
 unsigned int *count;
 
-// recursive function to get directories
-int loop_files(const char *path, const struct stat *sb, int type, struct FTW* buf) {
-    // return if encounter directory
-    if (type != FTW_F) return 0;
-
-    // check if path exists, if not add to dir
-    if (path_exists(pass, get_relative_path(dir, (char *)path))
-            || path_exists(fail, get_relative_path(dir, (char *)path)))
-        return 0;
-    add_path_to_dir(get_relative_path(dir, (char *)path) , extras);
-    (*count)++;
-    return 0;
-}
-
-void looper(char *name) {
-    nftw(name, &loop_files, 1, FTW_PHYS);
-}
+define_func
 
 // iterate through directories, path is absolute path
 void file_iterator(char *dirl, char *srcl, char *dstl,
