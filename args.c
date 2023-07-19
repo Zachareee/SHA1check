@@ -4,6 +4,7 @@
 #include <unistd.h>
 
 #include "paths.h"
+#include "version.h"
 
 void parse_args(int argc, char **argv, char *src,
         char *dst, char *dir) {
@@ -28,7 +29,7 @@ void parse_args(int argc, char **argv, char *src,
 
     // loop to get values for options
     // which is -s and -d
-    while ((opt = getopt(argc, argv, ":s:d:-")) != -1) {
+    while ((opt = getopt(argc, argv, ":s:d:v-")) != -1) {
         switch (opt) {
             // return if value is missing
             case ':':
@@ -38,6 +39,9 @@ void parse_args(int argc, char **argv, char *src,
             case '?':
                 printf("Unknown option: -%c\n", optopt);
                 exit(-1);
+            case 'v':
+                printf("SHA1sum version: %s\n",version);
+                exit(0);
             case 'd':
             case 's':
                 // return if value starts with ':'

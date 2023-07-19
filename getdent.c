@@ -59,9 +59,7 @@ error:                                                                          
 
 #ifdef __APPLE__
 
-#define getdent (path) { \
-    nftw(path, &loop_files, 1, FTW_PHYS);\
-}
+#define getdent looper
 
 #endif
 
@@ -74,6 +72,22 @@ char *dir, *src, *dst;
 unsigned int *count;
 
 // recursive function to get directories
+int loop_files(const char *path, const struct stat *sb, int type, struct FTW* buf) {
+    // return if encounter directory
+    if (type != FTW_F) return 0;
+
+    // check if path exists, if not add to dir
+    if (path_exists(pass, get_relative_path(dir, (char *)path))
+            || path_exists(fail, get_relative_path(dir, (char *)path)))
+        return 0;
+    add_path_to_dir(get_relative_path(dir, (char *)path) , extras);
+    (*count)++;
+    return 0;
+}
+
+void looper(char *name) {
+    nftw(name, &loop_files, 1, FTW_PHYS);
+}
 
 // iterate through directories, path is absolute path
 void file_iterator(char *dirl, char *srcl, char *dstl,
@@ -87,17 +101,4 @@ void file_iterator(char *dirl, char *srcl, char *dstl,
     count = countl;
 
     getdent(dir);
-}
-
-int loop_files(const char *path, const struct stat *sb, int type) {
-    // return if encounter directory
-    if (type != FTW_F) return 0;
-
-    // check if path exists, if not add to dir
-    if (path_exists(pass, get_relative_path(dir, path))
-            || path_exists(fail, get_relative_path(dir, path)))
-        continue;
-    add_path_to_dir(get_relative_path(dir, path) , extras);
-    (*count)++;
-    return 0;
 }
