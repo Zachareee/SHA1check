@@ -31,7 +31,6 @@ int main(int argc, char **argv) {
 
     parse_args(argc, argv, src, dst, dir);
 
-    printf("%s\n", dst);
     // checks if file exists
     if (!check_exists(dir, 0)) {
         printf("%s is not a directory\n", dir);

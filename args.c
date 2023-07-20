@@ -88,7 +88,6 @@ void parse_args(int argc, char **argv, char *src,
 
     if (destination[0] == ':') strcpy(dst, destination + 1);
     else {
-        printf("Alt path\n");
         strcpy(dst, destination);
         concat_path(directory, dst);
     }
