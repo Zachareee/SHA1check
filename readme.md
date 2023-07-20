@@ -26,4 +26,4 @@ Supply the executable with the following:
 >FOLDERPATH always uses absolute path, there is no need for ':'
 
 ## Supported OS
-The current source supports Linux ONLY, plans are in place to make it cross-platform (Mainly for Windows)
+The current source supports Linux and macOS, plans are in place to make it cross-platform (Mainly for Windows)
