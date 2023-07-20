@@ -48,8 +48,6 @@
         nread = syscall(SYS_getdents, fd, buf, BUF_SIZE);                       \
     }                                                                           \
                                                                                 \
-    return 0;                                                                   \
-                                                                                \
 error:                                                                          \
     printf("Something went wrong while reading the directory\n");               \
     exit(-4);                                                                   \
