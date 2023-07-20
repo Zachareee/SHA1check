@@ -110,4 +110,6 @@ int main(int argc, char **argv) {
     write_dir_to_file(missing, 0, checkfile);
 
     fclose(checkfile);
+
+    printf("\n%d files failed hashsum checks, %d files could not be found\n", arr[2], arr[1]);
 }

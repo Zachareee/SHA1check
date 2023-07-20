@@ -1,7 +1,10 @@
+PROGNAME=main
+
 CC=clang
 CF=-c -Wall --optimize -I headers
 CFD=-c -Wall -g -fsanitize=address -I headers
 NUM=1 2
+
 NAMES=args compare dir files getdent hashing paths main
 SRC=$(foreach name,$(NAMES),$(name).c)
 OBJECTS=$(foreach name,$(NAMES),$(name).o)
@@ -10,15 +13,15 @@ DBGOBJ=$(foreach name,$(NAMES),$(name)-debug.o)
 prod: prog clean
 
 prog: $(OBJECTS)
-	$(CC) $(OBJECTS) -lcrypto -o main
+	$(CC) $(OBJECTS) -lcrypto -o $(PROGNAME)
 
 debug: prog-debug clean
 
 prog-debug: $(DBGOBJ)
-	$(CC) $(DBGOBJ) -g -fsanitize=address -lcrypto -o main-debug
+	$(CC) $(DBGOBJ) -g -fsanitize=address -lcrypto -o $(PROGNAME)-debug
 
 $(DBGOBJ): $(SRC)
-	@echo Building debug
+	@echo Building $(PROGNAME)-debug
 	@i=0
 	@for i in $(NUM) ; do \
 		echo;\
@@ -34,7 +37,7 @@ $(DBGOBJ): $(SRC)
 	done
 
 $(OBJECTS): $(SRC)
-	@echo Building main
+	@echo Building $(PROGNAME)
 	@i=0
 	@for i in $(NUM) ; do \
 		echo;\
