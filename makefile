@@ -1,4 +1,4 @@
-PROGNAME=main
+PROGNAME=SHA1check
 
 CC=clang
 CF=-c -Wall --optimize -I headers
