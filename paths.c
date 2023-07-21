@@ -1,14 +1,12 @@
 #include <string.h>
 #include <limits.h>
+#include <stdio.h>
 
 // concats dir and file and copies into file
 void concat_path(char *dir, char *file) {
-    char ptr[PATH_MAX];
-    *ptr = '\0';
-    strcat(ptr, dir);
-    strcat(ptr, "/");
-    strcat(ptr, file);
-    strcpy(file, ptr);
+    char path[PATH_MAX];
+    snprintf(path, PATH_MAX, "%s/%s", dir, file);
+    strcpy(file, path);
 }
 
 char *get_relative_path(char *dir, char *file) {

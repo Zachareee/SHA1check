@@ -32,8 +32,6 @@ int main(int argc, char **argv) {
     parse_args(argc, argv, src, dst, dir);
 
     // checks if file exists
-    concat_path(dir, src);
-    concat_path(dir, dst);
     if (!check_exists(dir, 0)) {
         printf("%s is not a directory\n", dir);
         return -1;
@@ -91,7 +89,7 @@ int main(int argc, char **argv) {
 
     fclose(hashfile);
 
-    loop_files(dir, src, dst, passed, failed, extra, arr + 3);
+    file_iterator(dir, src, dst, passed, failed, extra, arr + 3);
 
     // creates a char array which can hold the number of files as text
     char length[11] = {0};
@@ -112,4 +110,6 @@ int main(int argc, char **argv) {
     write_dir_to_file(missing, 0, checkfile);
 
     fclose(checkfile);
+
+    printf("\n%d files failed hashsum checks, %d files could not be found\n", arr[2], arr[1]);
 }

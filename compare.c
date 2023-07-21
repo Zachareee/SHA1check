@@ -11,26 +11,19 @@
 #define LINELEN 128
 
 regex_t reghex;
-regex_t regws;
 
 // init regex sequences
 void regex_init() {
-    int regh = regcomp(&reghex, "[0-9a-zA-Z]{40}", REG_EXTENDED);
-    int regw = regcomp(&regws, "\\s", REG_EXTENDED);
-    if (regh || regw) {
+    int regh = regcomp(&reghex, "[0-9a-fA-F]{40}", REG_EXTENDED);
+    if (regh) {
         printf("Something went wrong while initialising pattern matcher\n");
         exit(-2);
     }
 }
 
-// returns 1 if whitespace character is matched
-int whitespace(char *ptr) {
-    return !regexec(&regws, ptr, 0, NULL, 0);
-}
-
 // trim trailing whitespaces in the line
 void trim(char *line, int offset) {
-    for (int i = offset - 1; whitespace(line); i--) {
+    for (int i = offset - 1; line[i] == ' ' || line[i] == '\t'; i--) {
         line[i] = 0;
     }
 }
@@ -75,5 +68,4 @@ int compare(char *dir, char *line) {
 // frees regex allocs
 void free_regex() {
     regfree(&reghex);
-    regfree(&regws);
 }

@@ -1,36 +1,56 @@
+PROGNAME=SHA1check
+
 CC=clang
-CF=$(CFLAGS)
-CFLAGS=-c -Wall --optimize -I headers
-CFLAGSD=-c -Wall -g -fsanitize=address -I headers
-OBJECTS=args.o compare.o dir.o files.o hashing.o paths.o main.o
-all: prog clean
+CF=-c -Wall --optimize -I headers
+CFD=-c -Wall -g -fsanitize=address -I headers
+NUM=1 2
+
+NAMES=args compare dir files getdent hashing paths main
+SRC=$(foreach name,$(NAMES),$(name).c)
+OBJECTS=$(foreach name,$(NAMES),$(name).o)
+DBGOBJ=$(foreach name,$(NAMES),$(name)-debug.o)
+
+prod: prog clean
 
 prog: $(OBJECTS)
-	$(CC) $(OBJECTS) --optimize -lcrypto -o main
+	$(CC) $(OBJECTS) -lcrypto -o $(PROGNAME)
 
-args.o:args.c
-	$(CC) $(CF) args.c
+debug: prog-debug clean
 
-compare.o:compare.c
-	$(CC) $(CF) compare.c
+prog-debug: $(DBGOBJ)
+	$(CC) $(DBGOBJ) -g -fsanitize=address -lcrypto -o $(PROGNAME)-debug
 
-dir.o:dir.c
-	$(CC) $(CF) dir.c
+$(DBGOBJ): $(SRC)
+	@echo Building $(PROGNAME)-debug
+	@i=0
+	@for i in $(NUM) ; do \
+		echo;\
+	done
+	@for file in $(SRC); do \
+		$(CC) $(CFD) $$file -o $${file%.c}-debug.o; \
+		if [ $$? = 0 ]; then \
+			echo $${file} compiled ;\
+		else \
+			echo $${file} did not compile ;\
+			exit 1 ;\
+		fi \
+	done
 
-files.o:files.c
-	$(CC) $(CF) files.c
-
-hashing.o:hashing.c
-	$(CC) $(CF) hashing.c
-
-paths.o:paths.c
-	$(CC) $(CF) paths.c
-
-main.o:main.c
-	$(CC) $(CF) main.c
+$(OBJECTS): $(SRC)
+	@echo Building $(PROGNAME)
+	@i=0
+	@for i in $(NUM) ; do \
+		echo;\
+	done
+	@for file in $(SRC); do \
+		$(CC) $(CF) $$file -o $${file%.c}.o; \
+		if [ $$? = 0 ]; then \
+			echo $${file} compiled ;\
+		else \
+			echo $${file} did not compile ;\
+			exit 1 ;\
+		fi \
+	done
 
 clean:
 	rm -rf *.o
-
-run:
-	 ./main .
