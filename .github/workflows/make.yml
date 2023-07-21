@@ -37,7 +37,7 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "SHA1sum"
+          artifacts: "SHA1check"
           generateReleaseNotes: true
           name: "Release v${{ steps.version.outputs.version }}"
           tag: "v${{ steps.version.outputs.version }}"
