@@ -32,7 +32,7 @@ jobs:
           increment: patch
 
       - name: Build
-        run: echo "char *version = \"${{ steps.version.outputs.version }}\";" > header.h && make && ls
+        run: echo "char *version = \"${{ steps.version.outputs.version }}\";" > version.h && make && ls
 
       - name: Create Release
         uses: ncipollo/release-action@v1
