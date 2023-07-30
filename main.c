@@ -67,20 +67,21 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
-        if (!c) {
-            add_path_to_dir(ptr, passed);
-            state = "OK";
-            arr[0]++;
-        } else {
-            add_path_to_dir(ptr, failed);
-            state = "FAILED";
-            arr[2]++;
-        }
-
-        if (c == -2) {
-            add_path_to_dir(ptr, missing);
-            state = "MISSING";
-            arr[1]++;
+        switch (c) {
+            case 0:
+                add_path_to_dir(ptr, passed);
+                state = "OK";
+                arr[0]++;
+                break;
+            case -2:
+                add_path_to_dir(ptr, missing);
+                state = "MISSING";
+                arr[1]++;
+                break;
+            default:
+                add_path_to_dir(ptr, failed);
+                state = "FAILED";
+                arr[2]++;
         }
 
         write_to_file(checkfile, "%s: ", ptr);
