@@ -50,12 +50,9 @@ void obf_hash(char *line, char *result) {
 // returns -1 if no hash found, -2 if file not found
 // 0 if hashsum equal and positive if strcmp fails
 int compare(char *dir, char *line, int ver) {
-    long result;
-    char *hash_value;
-    char hex[41];
-    regmatch_t pmatch[1];
     int limit;
     regex_t *reg;
+    regmatch_t pmatch[1];
 
     if (ver == 1) {
         limit = 40;
@@ -65,11 +62,11 @@ int compare(char *dir, char *line, int ver) {
         reg = &reghex2;
     }
 
-    hex[limit] = 0;
-
     // find hexstring and copy to hex, return -1 if no matches
     int match = regexec(reg, line, 1, pmatch, 0);
     if (match) return -1;
+
+    char hex[41] = {0};
     strncpy(hex, line + pmatch[0].rm_so, limit);
 
     // trim line to find file
@@ -87,15 +84,16 @@ int compare(char *dir, char *line, int ver) {
     struct stat s;
     stat(path, &s);
 
-    hash_value = hash(path, s.st_size);
+    char *hash_value = hash(path, s.st_size);
 
+    long result;
     if (ver == 1) {
         result = (long) strcmp(hash_value, hex);
     } else {
         long size;
         sscanf(line + pmatch[0].rm_eo, "%ld", &size);
 
-        char temp[24];
+        char temp[24] = {0};
         obf_hash(hash_value, temp);
         result = (long) strcmp(temp, hex);
         result |= s.st_size - size;

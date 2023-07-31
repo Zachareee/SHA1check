@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 
     int version = 0;
     char *line;
-    while ((line = get_line(hashfile)) && !version) {
+    while ((line = get_line(hashfile))) {
         version = get_hash_ver(line);
         free(line);
         if (version) goto ver;
