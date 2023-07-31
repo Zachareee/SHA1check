@@ -52,7 +52,7 @@ void obf_hash(char *line, char *result) {
 int compare(char *dir, char *line, int ver) {
     long result;
     char *hash_value;
-    char hex[41];
+    char hex[41] = {0};
     regmatch_t pmatch[1];
     int limit;
     regex_t *reg;
@@ -64,8 +64,6 @@ int compare(char *dir, char *line, int ver) {
         limit = 23;
         reg = &reghex2;
     }
-
-    hex[limit] = 0;
 
     // find hexstring and copy to hex, return -1 if no matches
     int match = regexec(reg, line, 1, pmatch, 0);
