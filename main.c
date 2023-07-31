@@ -45,9 +45,24 @@ int main(int argc, char **argv) {
     regex_init();
 
     FILE *hashfile = fopen(src, "r");
+
+    int version = 0;
+    char *line;
+    while ((line = get_line(hashfile)) && !version) {
+        version = get_hash_ver(line);
+        free(line);
+        if (version) goto ver;
+    }
+
+    printf("Could not find hashsum version, exiting...\n");
+    return -5;
+
+    ver:
+
+    fprintf(stderr, "Version %d hashfile detected\n", version);
+    fseek(hashfile, 0, SEEK_SET);
     FILE *checkfile = fopen(dst, "w");
 
-    char *line = get_line(hashfile);
     char ptr[PATH_MAX];
     char *state;
     // 0: OK, 1: MISSING, 2: FAILED, 3: EXTRA
@@ -58,12 +73,10 @@ int main(int argc, char **argv) {
     failed = calloc(1, sizeof(dir_t));
     extra = calloc(1, sizeof(dir_t));
 
-    while (line) {
+    while ((line = get_line(hashfile))) {
         strcpy(ptr, line);
         free(line);
-        int c = compare(dir, ptr);
-
-        line = get_line(hashfile);
+        int c = compare(dir, ptr, version);
 
         if (c == -1) continue;
 

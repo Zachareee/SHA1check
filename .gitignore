@@ -3,3 +3,4 @@ hashes.sha1
 *.swp
 checksum.txt
 *.o
+SHA1check*
