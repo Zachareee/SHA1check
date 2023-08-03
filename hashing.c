@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef _WIN32
 #include <openssl/evp.h>
+#else
+#include <stdio.h>
+#endif
 
 #include "datatypes.h"
 #define CHUNK 131072

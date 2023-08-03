@@ -1,14 +1,14 @@
-#include <dirent.h>
-#include <fcntl.h>
-#include <ftw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined __unix__
+#include <dirent.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#ifdef __unix__
 #define BUF_SIZE 1024
 #define define_func void getdent(char *name) {                                  \
     int fd, nread;                                                              \
@@ -55,11 +55,11 @@ error:                                                                          
     exit(-4);                                                                   \
 }
 
-#endif
+#elif defined _WIN32
 
-#ifdef __APPLE__
+#else
+#include <ftw.h>
 
-#define getdent looper
 #define define_func int loop_files(const char *path, const struct stat *sb,     \
         int type, struct FTW* buf) {                                            \
     if (type != FTW_F) return 0;                                                \
@@ -72,7 +72,7 @@ error:                                                                          
     return 0;                                                                   \
 }                                                                               \
                                                                                 \
-void looper(char *name) {                                                       \
+void getdent(char *name) {                                                      \
     nftw(name, &loop_files, 1, FTW_PHYS);                                       \
 }
 
