@@ -10,36 +10,10 @@
 #include "datatypes.h"
 #define CHUNK 131072
 
-char byte_to_hex(char b) {
-    switch (b) {
-        case 10:
-            return 'a';
-        case 11:
-            return 'b';
-        case 12:
-            return 'c';
-        case 13:
-            return 'd';
-        case 14:
-            return 'e';
-        case 15:
-            return 'f';
-        default:
-            return b + '0';
-    }
-}
-
 void hexdigest(unsigned char *digest, char *result) {
     // loop through all chars of digest
     for (int i = 0; i < 20; i++) {
-        unsigned char c = digest[i];
-
-        // mask the top 4 and bottom 4 bits and
-        // convert to hex
-        char top = (c & 0xf0) >> 4;
-        char bot = c & 0x0f;
-        result[2 * i] = byte_to_hex(top);
-        result[2 * i + 1] = byte_to_hex(bot);
+        snprintf(result + 2 * i, 3, "%02x", digest[i]);
     }
 
     result[40] = '\0';
