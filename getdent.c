@@ -56,6 +56,32 @@ error:                                                                          
 }
 
 #elif defined _WIN32
+#include <Windows.h>
+
+#define define_func void getdent(const char *folder) {                          \
+    char path[MAX_PATH];                                                        \
+    sprintf(path, "%s\\*", folder);                                             \
+    WIN32_FIND_DATA fd;                                                         \
+    HANDLE handle = FindFirstFile(path, &fd);                                   \
+    if(handle == INVALID_HANDLE_VALUE) return;                                  \
+    do {                                                                        \
+        if(!strcmp(fd.cFileName, ".") || !strcmp(fd.cFileName, "..")) continue; \
+        sprintf(path, "%s\\%s", folder, fd.cFileName);                          \
+        printf("%s\n", path);                                                   \
+                                                                                \
+        if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) getdent(path);       \
+        else {                                                                  \
+            if (!strcmp(path, src) || !strcmp(path, dst)) continue;             \
+            if (path_exists(pass, get_relative_path(dir, path))                 \
+                    || path_exists(fail, get_relative_path(dir, path)))         \
+                continue;                                                       \
+                                                                                \
+            add_path_to_dir(get_relative_path(dir, path), extras);              \
+            (*count)++;                                                         \
+        }                                                                       \
+    } while(FindNextFile(handle, &fd));                                         \
+    FindClose(handle);                                                          \
+}
 
 #else
 #include <ftw.h>
