@@ -8,7 +8,6 @@
 #include "files.h"
 #include "hashing.h"
 #include "paths.h"
-#define LINELEN 128
 
 regex_t reghex1;
 regex_t reghex2;
