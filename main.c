@@ -20,7 +20,6 @@ void free_all() {
     if (missing) free_dir(missing);
     if (failed) free_dir(failed);
     if (extra) free_dir(extra);
-    free_regex();
 }
 
 int main(int argc, char **argv) {
@@ -41,8 +40,6 @@ int main(int argc, char **argv) {
         printf("%s is not a file\n", src);
         return -1;
     }
-
-    regex_init();
 
     FILE *hashfile = fopen(src, "r");
 
