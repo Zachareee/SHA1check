@@ -9,8 +9,7 @@
 #include "paths.h"
 
 int is_hex(char c) {
-    if (('0' <= c && c <= '9') || ('a' <= c && c <= 'f')) return 1;
-    return 0;
+    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f');
 }
 
 // homemade regex
@@ -102,7 +101,7 @@ int compare(char *dir, char *line, int ver) {
     int match = matcher(line, ver, range);
     if (match) return -1;
 
-    char hex[41] = {0};
+    char hex[limit + 1];
     strncpy(hex, line + range[0], limit);
 
     // trim line to find file

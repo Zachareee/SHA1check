@@ -4,6 +4,6 @@ for %%i in (*.c) do (
 	gcc -c -I headers %%i -o %%~ni.o
 	echo.
 )
-gcc *.o -o main.exe
+gcc *.o -o SHA1check.exe
 del *.o
 pause
