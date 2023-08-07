@@ -6,6 +6,12 @@
 #include "paths.h"
 #include "version.h"
 
+#ifdef _WIN32
+#define win 1
+#else
+#define win 0
+#endif
+
 char *help_string =
 "usage: %s [-h] [-s SOURCE] [-d DESTINATION] path\n\
 \n\
@@ -100,8 +106,13 @@ void parse_args(int argc, char **argv, char *src,
         else directory = argv[optind];
     }
 
-    // realpath(directory, dir); // uncomment for testing
-    strcpy(dir, directory); // uncomment for production
+    // for windows, removes " at the end of the path and changes all backslashes
+    if (win) {
+        int len = strlen(directory);
+        if (directory[len - 1] == '\"') directory[len-1] = 0;
+    }
+
+    strcpy(dir, directory);
 
     if (source[0] == ':') strcpy(src, source + 1);
     else {

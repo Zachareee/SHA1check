@@ -7,15 +7,16 @@ Use `make` to build without debug symbols
 Use `make debug` to build with address sanitizer and debug symbols
 
 ## Usage:
-`main FOLDERPATH [-s HASHFILENAME] [-d RESULTFILENAME]`
+`SHA1check FOLDERPATH [-s HASHFILENAME] [-d RESULTFILENAME]`
 
 Supply the executable with the following:
 ### Positional (Required)
 1. `FOLDERPATH` : The directory in which the files exist
 ### Options
-1.  `-h` : display this help message
+1. `-h` : display this help message
 1. `-s` : source file i.e. file containing hashes in "FILE  HASHSUM" format
 1. `-d` : destination file
+1. `-v` : display current version
 
 >HASHPATH default: FOLDERPATH/hashes.sha1
 >

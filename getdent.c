@@ -1,14 +1,14 @@
-#include <dirent.h>
-#include <fcntl.h>
-#include <ftw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#if defined __unix__
+#include <dirent.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
 #include <unistd.h>
 
-#ifdef __unix__
 #define BUF_SIZE 1024
 #define define_func void getdent(char *name) {                                  \
     int fd, nread;                                                              \
@@ -55,11 +55,36 @@ error:                                                                          
     exit(-4);                                                                   \
 }
 
-#endif
+#elif defined _WIN32
+#include <Windows.h>
 
-#ifdef __APPLE__
+#define define_func void getdent(const char *folder) {                          \
+    char path[MAX_PATH];                                                        \
+    sprintf(path, "%s/*", folder);                                              \
+    WIN32_FIND_DATA fd;                                                         \
+    HANDLE handle = FindFirstFile(path, &fd);                                   \
+    if(handle == INVALID_HANDLE_VALUE) return;                                  \
+    do {                                                                        \
+        if(!strcmp(fd.cFileName, ".") || !strcmp(fd.cFileName, "..")) continue; \
+        sprintf(path, "%s/%s", folder, fd.cFileName);                           \
+                                                                                \
+        if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) getdent(path);       \
+        else {                                                                  \
+            if (!strcmp(path, src) || !strcmp(path, dst)) continue;             \
+            if (path_exists(pass, get_relative_path(dir, path))                 \
+                    || path_exists(fail, get_relative_path(dir, path)))         \
+                continue;                                                       \
+                                                                                \
+            add_path_to_dir(get_relative_path(dir, path), extras);              \
+            (*count)++;                                                         \
+        }                                                                       \
+    } while(FindNextFile(handle, &fd));                                         \
+    FindClose(handle);                                                          \
+}
 
-#define getdent looper
+#else
+#include <ftw.h>
+
 #define define_func int loop_files(const char *path, const struct stat *sb,     \
         int type, struct FTW* buf) {                                            \
     if (type != FTW_F) return 0;                                                \
@@ -72,7 +97,7 @@ error:                                                                          
     return 0;                                                                   \
 }                                                                               \
                                                                                 \
-void looper(char *name) {                                                       \
+void getdent(char *name) {                                                      \
     nftw(name, &loop_files, 1, FTW_PHYS);                                       \
 }
 

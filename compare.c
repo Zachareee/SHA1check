@@ -1,5 +1,4 @@
 #include <limits.h>
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,27 +7,66 @@
 #include "files.h"
 #include "hashing.h"
 #include "paths.h"
-#define LINELEN 128
 
-regex_t reghex1;
-regex_t reghex2;
+int is_hex(char c) {
+    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f');
+}
 
-// init regex sequences
-void regex_init() {
-    int regh1 = regcomp(&reghex1, "[0-9a-fA-F]{40}", REG_EXTENDED);
-    int regh2 = regcomp(&reghex2, "[0-9a-fA-F]{10}\\*\\*\\*[0-9a-fA-F]{10}", REG_EXTENDED);
-    if (regh1 | regh2) {
-        printf("Something went wrong while initialising pattern matcher\n");
-        exit(-2);
+// homemade regex
+int matcher(char *str, int ver, int *range) {
+    int len = strlen(str);
+    if (ver == 1) {
+        for (int i = 0; i < len; i++) {
+            int j = i;
+            for (; j < len; j++) {
+                if (!is_hex(str[j])) break;
+            }
+
+            if (j - i == 40) {
+                if (range) {
+                    range[0] = i;
+                    range[1] = j;
+                }
+                return 0;
+            }
+        }
+    } else {
+        for (int i = 0; i < len; i++) {
+            int j = 0;
+            for (; i + j < len && j < 10; j++) {
+                if (!is_hex(str[i + j])) break;
+            }
+
+            if (j != 10) continue;
+
+            for (; i + j < len && j < 13; j++) {
+                if (str[i + j] != '*') break;
+            }
+
+            if (j != 13) continue;
+
+            for (; i + j < len && j < 23; j++) {
+                if (!is_hex(str[i + j])) break;
+            }
+
+            if (j != 23) continue;
+            if (range) {
+                range[0] = i;
+                range[1] = i + 23;
+            }
+
+            return 0;
+        }
     }
+    return 1;
 }
 
 // if full hash given, return 1
 // if partial hash given in the form of reghex2, returns 2
 // if unknown, return 0
 int get_hash_ver(char *line) {
-    if (!regexec(&reghex1, line, 0, NULL, 0)) return 1;
-    if (!regexec(&reghex2, line, 0, NULL, 0)) return 2;
+    if (!matcher(line, 1, NULL)) return 1;
+    if (!matcher(line, 2, NULL)) return 2;
     return 0;
 }
 
@@ -51,26 +89,23 @@ void obf_hash(char *line, char *result) {
 // 0 if hashsum equal and positive if strcmp fails
 int compare(char *dir, char *line, int ver) {
     int limit;
-    regex_t *reg;
-    regmatch_t pmatch[1];
 
     if (ver == 1) {
         limit = 40;
-        reg = &reghex1;
     } else {
         limit = 23;
-        reg = &reghex2;
     }
 
+    int range[2] = {0};
     // find hexstring and copy to hex, return -1 if no matches
-    int match = regexec(reg, line, 1, pmatch, 0);
+    int match = matcher(line, ver, range);
     if (match) return -1;
 
-    char hex[41] = {0};
-    strncpy(hex, line + pmatch[0].rm_so, limit);
+    char hex[limit + 1];
+    strncpy(hex, line + range[0], limit);
 
     // trim line to find file
-    trim(line, pmatch[0].rm_so);
+    trim(line, range[0]);
 
     // copy to path and concat
     char path[PATH_MAX];
@@ -91,7 +126,7 @@ int compare(char *dir, char *line, int ver) {
         result = (long) strcmp(hash_value, hex);
     } else {
         long size;
-        sscanf(line + pmatch[0].rm_eo, "%ld", &size);
+        sscanf(line + range[1], "%ld", &size);
 
         char temp[24] = {0};
         obf_hash(hash_value, temp);
@@ -104,10 +139,4 @@ int compare(char *dir, char *line, int ver) {
     // free malloc-ed variables
     free(hash_value);
     return !!result;
-}
-
-// frees regex allocs
-void free_regex() {
-    regfree(&reghex1);
-    regfree(&reghex2);
 }
