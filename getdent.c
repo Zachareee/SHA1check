@@ -60,14 +60,13 @@ error:                                                                          
 
 #define define_func void getdent(const char *folder) {                          \
     char path[MAX_PATH];                                                        \
-    sprintf(path, "%s\\*", folder);                                             \
+    sprintf(path, "%s/*", folder);                                              \
     WIN32_FIND_DATA fd;                                                         \
     HANDLE handle = FindFirstFile(path, &fd);                                   \
     if(handle == INVALID_HANDLE_VALUE) return;                                  \
     do {                                                                        \
         if(!strcmp(fd.cFileName, ".") || !strcmp(fd.cFileName, "..")) continue; \
-        sprintf(path, "%s\\%s", folder, fd.cFileName);                          \
-        printf("%s\n", path);                                                   \
+        sprintf(path, "%s/%s", folder, fd.cFileName);                           \
                                                                                 \
         if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) getdent(path);       \
         else {                                                                  \

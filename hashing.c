@@ -18,11 +18,12 @@
     HCRYPTPROV context;                                                        \
     CryptAcquireContext(&context, NULL, NULL, PROV_RSA_FULL,                   \
             CRYPT_VERIFYCONTEXT);                                              \
-    stat = CryptCreateHash(context, CALG_SHA, 0, 0, (HCRYPTHASH *) (ctx))
+    stat = !CryptCreateHash(context, CALG_SHA, 0, 0, (HCRYPTHASH *) (ctx))
 #define hash_append(ctx, buffer, read_size)                                    \
     CryptHashData((HCRYPTHASH) (ctx), (buffer), (read_size), 0)
 #define end_hash(ctx, digest)                                                  \
-    CryptGetHashParam((HCRYPTHASH) (ctx), HP_HASHVAL, (digest), &stat, 0);     \
+    unsigned long d_size = 21;                                                 \
+    CryptGetHashParam((HCRYPTHASH) (ctx), HP_HASHVAL, (digest), &d_size, 0);   \
     CryptDestroyHash((HCRYPTHASH) (ctx));                                      \
     CryptReleaseContext((HCRYPTHASH) (ctx), 0)
 #endif
@@ -45,7 +46,7 @@ char *hash(char *path, size_t size) {
     // SHA struct init
     unsigned char digest[20];
     void *ctx;
-    unsigned long stat;
+    int stat;
     hash_init(&ctx, stat);
     if (stat) {
         printf("There was a problem initialising the hasher");
@@ -53,7 +54,7 @@ char *hash(char *path, size_t size) {
     }
 
     // try to open file
-    FILE *f = fopen(path, "r");
+    FILE *f = fopen(path, "rb");
     if (!f) return NULL;
 
     // loops through the whole file
