@@ -22,7 +22,6 @@ prog-debug: $(DBGOBJ)
 
 $(DBGOBJ): $(SRC)
 	@echo Building $(PROGNAME)-debug
-	@i=0
 	@for i in $(NUM) ; do \
 		echo;\
 	done
@@ -38,7 +37,6 @@ $(DBGOBJ): $(SRC)
 
 $(OBJECTS): $(SRC)
 	@echo Building $(PROGNAME)
-	@i=0
 	@for i in $(NUM) ; do \
 		echo;\
 	done
