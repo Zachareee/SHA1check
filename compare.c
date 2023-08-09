@@ -114,7 +114,7 @@ int compare(char *dir, char *line, int ver) {
     concat_path(dir, path);
     if (!check_exists(path, 1)) return -2;
 
-    fprintf(stderr, "Checking %s...", get_relative_path(dir, path));
+    fprintf(stderr, "Checking %s...", get_relative_path(path));
 
     // construct file_struct to give to hash function
     struct stat s;

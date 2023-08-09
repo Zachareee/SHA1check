@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     char dir[PATH_MAX];
 
     parse_args(argc, argv, src, dst, dir);
+    init_path(dir);
 
     // checks if file exists
     if (!check_exists(dir, 0)) {
