@@ -125,7 +125,7 @@ int compare(char *dir, char *line, int ver) {
     long result;
     if (ver == 1) {
         result = (long) strcmp(hash_value, hex);
-        printf("\nExpected: %s\nCurrent:  %s\n", hex, hash_value);
+        // printf("\nExpected: %s\nCurrent:  %s\n", hex, hash_value);
     } else {
         long size;
         int stat = sscanf(line + range[1], "%ld", &size);
@@ -137,7 +137,7 @@ int compare(char *dir, char *line, int ver) {
         char temp[24] = {0};
         obf_hash(hash_value, temp);
         result = (long) strcmp(temp, hex);
-        printf("\nExpected: %s\nCurrent:  %s\n", hex, temp);
+        // printf("\nExpected: %s\nCurrent:  %s\n", hex, temp);
         result |= s.st_size - size;
     }
 
