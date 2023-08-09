@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     char dir[PATH_MAX];
 
     parse_args(argc, argv, src, dst, dir);
+    init_path(dir);
 
     // checks if file exists
     if (!check_exists(dir, 0)) {
@@ -77,6 +78,8 @@ int main(int argc, char **argv) {
 
         if (c == -1) continue;
 
+        write_to_file(checkfile, "%s: ", ptr);
+
         switch (c) {
             case 0:
                 add_path_to_dir(ptr, passed);
@@ -94,7 +97,6 @@ int main(int argc, char **argv) {
                 arr[2]++;
         }
 
-        write_to_file(checkfile, "%s: ", ptr);
         write_to_file(checkfile, "%s\n", state);
     }
 

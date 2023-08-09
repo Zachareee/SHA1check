@@ -21,7 +21,7 @@ char *get_line(FILE *f) {
     // collects chunks of bytes until encounter linebreak
     while(fgets(buffer, LINELEN, f) != NULL) {
         strcat(line, buffer);
-        if (line[strlen(line) - 1] == '\n') return line;
+        if (strlen(buffer) < LINELEN - 1) return line;
         line = realloc(line, (strlen(line) + LINELEN) * sizeof(char));
     }
 

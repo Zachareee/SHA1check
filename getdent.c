@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "datatypes.h"
+#include "dir.h"
+#include "paths.h"
+
 #if defined __unix__
 #include <dirent.h>
 #include <fcntl.h>
@@ -36,11 +40,11 @@
                 getdent(path);                                                  \
             } else {                                                            \
                 if (!strcmp(path, src) || !strcmp(path, dst)) continue;         \
-                if (path_exists(pass, get_relative_path(dir, path))             \
-                        || path_exists(fail, get_relative_path(dir, path)))     \
+                if (path_exists(pass, get_relative_path(path))                  \
+                        || path_exists(fail, get_relative_path(path)))          \
                     continue;                                                   \
                                                                                 \
-                add_path_to_dir(get_relative_path(dir, path) , extras);         \
+                add_path_to_dir(get_relative_path(path), extras);               \
                 (*count)++;                                                     \
             }                                                                   \
         }                                                                       \
@@ -71,11 +75,11 @@ error:                                                                          
         if(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) getdent(path);       \
         else {                                                                  \
             if (!strcmp(path, src) || !strcmp(path, dst)) continue;             \
-            if (path_exists(pass, get_relative_path(dir, path))                 \
-                    || path_exists(fail, get_relative_path(dir, path)))         \
+            if (path_exists(pass, get_relative_path(path))                      \
+                    || path_exists(fail, get_relative_path(path)))              \
                 continue;                                                       \
                                                                                 \
-            add_path_to_dir(get_relative_path(dir, path), extras);              \
+            add_path_to_dir(get_relative_path(path), extras);                   \
             (*count)++;                                                         \
         }                                                                       \
     } while(FindNextFile(handle, &fd));                                         \
@@ -89,10 +93,10 @@ error:                                                                          
         int type, struct FTW* buf) {                                            \
     if (type != FTW_F) return 0;                                                \
                                                                                 \
-    if (path_exists(pass, get_relative_path(dir, (char *)path))                 \
-            || path_exists(fail, get_relative_path(dir, (char *)path)))         \
+    if (path_exists(pass, get_relative_path((char *)path))                      \
+            || path_exists(fail, get_relative_path((char *)path)))              \
         return 0;                                                               \
-    add_path_to_dir(get_relative_path(dir, (char *)path) , extras);             \
+    add_path_to_dir(get_relative_path((char *)path) , extras);                  \
     (*count)++;                                                                 \
     return 0;                                                                   \
 }                                                                               \
@@ -102,10 +106,6 @@ void getdent(char *name) {                                                      
 }
 
 #endif
-
-#include "datatypes.h"
-#include "dir.h"
-#include "paths.h"
 
 dir_t *pass, *fail, *extras;
 char *dir, *src, *dst;

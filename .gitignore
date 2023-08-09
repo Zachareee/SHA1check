@@ -1,5 +1,5 @@
 main*
-hashes.sha1
+*.sha1
 *.swp
 checksum.txt
 *.o

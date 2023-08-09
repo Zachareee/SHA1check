@@ -102,6 +102,7 @@ int compare(char *dir, char *line, int ver) {
     if (match) return -1;
 
     char hex[limit + 1];
+    hex[limit] = 0;
     strncpy(hex, line + range[0], limit);
 
     // trim line to find file
@@ -113,7 +114,7 @@ int compare(char *dir, char *line, int ver) {
     concat_path(dir, path);
     if (!check_exists(path, 1)) return -2;
 
-    fprintf(stderr, "Checking %s...", get_relative_path(dir, path));
+    fprintf(stderr, "Checking %s...", get_relative_path(path));
 
     // construct file_struct to give to hash function
     struct stat s;
@@ -124,13 +125,19 @@ int compare(char *dir, char *line, int ver) {
     long result;
     if (ver == 1) {
         result = (long) strcmp(hash_value, hex);
+        // printf("\nExpected: %s\nCurrent:  %s\n", hex, hash_value);
     } else {
         long size;
-        sscanf(line + range[1], "%ld", &size);
+        int stat = sscanf(line + range[1], "%ld", &size);
+        if (!stat) {
+            printf("Error reading size value\n");
+            exit(-6);
+        }
 
         char temp[24] = {0};
         obf_hash(hash_value, temp);
         result = (long) strcmp(temp, hex);
+        // printf("\nExpected: %s\nCurrent:  %s\n", hex, temp);
         result |= s.st_size - size;
     }
 

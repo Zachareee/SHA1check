@@ -5,6 +5,7 @@
 #include "datatypes.h"
 #include "files.h"
 
+#define PATH_SEP "/"
 // creates directory with name and appends to dir
 void append_dir(dir_t *dir, char *name) {
     dir->folder = realloc(dir->folder, (dir->num + 1) * sizeof(dir_t *));
@@ -31,12 +32,12 @@ int path_exists(dir_t *dir, const char *path) {
     char copy[strlen(path) + 1];
     strcpy(copy, path);
 
-    char *token = strtok(copy, "/");
+    char *token = strtok(copy, PATH_SEP);
     int idx;
     while (token) {
         if ((idx = folder_exists(dir, token)) == -1) return 0;
         dir = dir->folder[idx];
-        token = strtok(NULL, "/");
+        token = strtok(NULL, PATH_SEP);
     }
 
     return 1;
@@ -44,14 +45,11 @@ int path_exists(dir_t *dir, const char *path) {
 
 // splits a path string by / and creates a dir_t form listing
 void add_path_to_dir(char *path, dir_t *dir) {
-    char *token = strtok(path, "/");
+    char *token = strtok(path, PATH_SEP);
     char *copy;
     int idx;
 
     while (token) {
-        // replaces token delimiter with / at all tokens after the first
-        if (token != path) *(token - 1) = '/';
-
         // if folder does not exist, append dir and continue
         if ((idx = folder_exists(dir, token)) == -1) {
             copy = malloc(sizeof(char) * (strlen(token) + 1));
@@ -60,7 +58,7 @@ void add_path_to_dir(char *path, dir_t *dir) {
             dir = dir->folder[dir->num - 1];
         } else dir = dir->folder[idx];
 
-        token = strtok(NULL, "/");
+        token = strtok(NULL, PATH_SEP);
     }
 }
 
