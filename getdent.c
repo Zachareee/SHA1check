@@ -109,13 +109,13 @@ void getdent(char *name) {                                                      
 
 dir_t *pass, *fail, *extras;
 char *dir, *src, *dst;
-unsigned int *count;
+unsigned long *count;
 
 define_func
 
 // iterate through directories, path is absolute path
 void file_iterator(char *dirl, char *srcl, char *dstl,
-        dir_t *passl, dir_t *faill, dir_t *extral, unsigned int *countl) {
+        dir_t *passl, dir_t *faill, dir_t *extral, unsigned long *countl) {
     pass = passl;
     fail = faill;
     extras = extral;
