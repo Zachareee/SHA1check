@@ -49,3 +49,17 @@ void write_to_file(FILE *f, char *format, char *line) {
     }
     fflush(f);
 }
+
+void write_dir_and_filecount(FILE *f, dir_t *dir, char *string) {
+    if (!dir) {
+        write_to_file(string);
+        return;
+    }
+
+    int count = 0;
+    long pos = ftell(f);
+    write_dir_to_file(dir, 0, f, &count);
+    fseek(f, pos, SEEK_SET);
+    write_to_file(f, string, count);
+    fseek(f, 0, SEEK_END);
+}

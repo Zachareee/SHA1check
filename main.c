@@ -111,7 +111,8 @@ int main(int argc, char **argv) {
     write_to_file(checkfile, "\n%s files OK\n", length);
 
     snprintf(length, 10, "%d", arr[3]);
-    write_to_file(checkfile, "\n%s files were not found in the hashfile:\n", length);
+    write_dir_and_filecount(checkfile, extra, "\n%s files were not found in the hashfile:\n");
+    write_to_file(checkfile,, length);
     write_dir_to_file(extra, 0, checkfile);
 
     snprintf(length, 10, "%d", arr[2]);
