@@ -64,7 +64,6 @@ int main(int argc, char **argv) {
     char ptr[PATH_MAX];
     char *state;
     // 0: OK, 1: MISSING, 2: FAILED, 3: EXTRA
-    unsigned int arr[4] = {0};
 
     passed = calloc(1, sizeof(dir_t));
     missing = calloc(1, sizeof(dir_t));
@@ -84,17 +83,14 @@ int main(int argc, char **argv) {
             case 0:
                 add_path_to_dir(ptr, passed);
                 state = "OK";
-                arr[0]++;
                 break;
             case -2:
                 add_path_to_dir(ptr, missing);
                 state = "MISSING";
-                arr[1]++;
                 break;
             default:
                 add_path_to_dir(ptr, failed);
                 state = "FAILED";
-                arr[2]++;
         }
 
         write_to_file(checkfile, "%s\n", state);
@@ -102,27 +98,30 @@ int main(int argc, char **argv) {
 
     fclose(hashfile);
 
-    file_iterator(dir, src, dst, passed, failed, extra, arr + 3);
+    unsigned int not_found = 0;
+    file_iterator(dir, src, dst, passed, failed, extra, &not_found);
 
     // creates a char array which can hold the number of files as text
     char length[11] = {0};
 
-    snprintf(length, 10, "%d", arr[0]);
+    snprintf(length, 10, "%d", count_files_in_dir(passed));
     write_to_file(checkfile, "\n%s files OK\n", length);
 
-    snprintf(length, 10, "%d", arr[3]);
+    snprintf(length, 10, "%d", count_files_in_dir(extra));
     write_to_file(checkfile, "\n%s files were not found in the hashfile:\n", length);
     write_dir_to_file(extra, 0, checkfile);
 
-    snprintf(length, 10, "%d", arr[2]);
+    int failed_count = count_files_in_dir(failed);
+    snprintf(length, 10, "%d", failed_count);
     write_to_file(checkfile, "\n%s files failed hashsum checks:\n", length);
     write_dir_to_file(failed, 0, checkfile);
 
-    snprintf(length, 10, "%d", arr[1]);
+    int missing_count = count_files_in_dir(missing);
+    snprintf(length, 10, "%d", missing_count);
     write_to_file(checkfile, "\n%s files could not be found:\n", length);
     write_dir_to_file(missing, 0, checkfile);
 
     fclose(checkfile);
 
-    printf("\n%d files failed hashsum checks, %d files could not be found\n", arr[2], arr[1]);
+    printf("\n%d files failed hashsum checks, %d files could not be found\n", failed_count, missing_count);
 }
