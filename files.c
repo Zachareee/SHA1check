@@ -49,15 +49,3 @@ void write_to_file(FILE *f, char *format, char *line) {
     }
     fflush(f);
 }
-
-unsigned long write_dir_and_filecount(FILE *f, dir_t *dir, char *string) {
-    unsigned long count = 0;
-    long pos = ftell(f);
-    write_dir_to_file(dir, 0, f, &count);
-    fseek(f, pos, SEEK_SET);
-    char length[11] = {0};
-    snprintf(length, 10, "%lu", count);
-    write_to_file(f, string, length);
-    fseek(f, 0, SEEK_END);
-    return count;
-}
