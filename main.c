@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "args.h"
 #include "compare.h"
@@ -24,20 +25,18 @@ void free_all() {
 
 int main(int argc, char **argv) {
     atexit(free_all);
-    char src[PATH_MAX];
-    char dst[PATH_MAX];
-    char dir[PATH_MAX];
+    char src[PATH_MAX], dst[PATH_MAX], dir[PATH_MAX];
 
     parse_args(argc, argv, src, dst, dir);
     init_path(dir);
 
     // checks if file exists
-    if (!check_exists(dir, 0)) {
+    if (!is_a_directory(dir)) {
         printf("%s is not a directory\n", dir);
         return -1;
     }
 
-    if (!check_exists(src, 1)) {
+    if (!is_a_file(src)) {
         printf("%s is not a file\n", src);
         return -1;
     }
@@ -101,25 +100,10 @@ int main(int argc, char **argv) {
     unsigned int not_found = 0;
     file_iterator(dir, src, dst, passed, failed, extra, &not_found);
 
-    // creates a char array which can hold the number of files as text
-    char length[11] = {0};
-
-    snprintf(length, 10, "%d", count_files_in_dir(passed));
-    write_to_file(checkfile, "\n%s files OK\n", length);
-
-    snprintf(length, 10, "%d", count_files_in_dir(extra));
-    write_to_file(checkfile, "\n%s files were not found in the hashfile:\n", length);
-    write_dir_to_file(extra, 0, checkfile);
-
-    int failed_count = count_files_in_dir(failed);
-    snprintf(length, 10, "%d", failed_count);
-    write_to_file(checkfile, "\n%s files failed hashsum checks:\n", length);
-    write_dir_to_file(failed, 0, checkfile);
-
-    int missing_count = count_files_in_dir(missing);
-    snprintf(length, 10, "%d", missing_count);
-    write_to_file(checkfile, "\n%s files could not be found:\n", length);
-    write_dir_to_file(missing, 0, checkfile);
+    write_file_count(passed, "\n%s files OK\n", checkfile, false);
+    write_file_count(extra, "\n%s files were not found in the hashfile:\n", checkfile, true);
+    int failed_count = write_file_count(failed, "\n%s files failed hashsum checks:\n", checkfile, true);
+    int missing_count = write_file_count(missing, "\n%s files could not be found:\n", checkfile, true);
 
     fclose(checkfile);
 

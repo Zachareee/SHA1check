@@ -3,6 +3,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 set objects=args compare dir files getdent hashing paths main
 set CF=--optimize
 
+echo.
 for %%i in (%objects%) do (
     gcc -c -Wall -I headers %CF% %%i.c -o %%i.o
     if !ERRORLEVEL!==0 (
@@ -11,7 +12,6 @@ for %%i in (%objects%) do (
         echo %%i.c did not compile
         exit /B 1
     )
-    echo.
     set output=!output! %%i.o
 )
 
