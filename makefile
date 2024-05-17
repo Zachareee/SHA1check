@@ -1,6 +1,6 @@
 PROGNAME=SHA1check
 
-CC=clang
+CC=gcc
 CF=-c -Wall --optimize -I headers
 CFD=-c -Wall -g -fsanitize=address -I headers
 NUM=1 2
