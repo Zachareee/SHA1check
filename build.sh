@@ -10,19 +10,17 @@ if [[ $1 = 'debug' ]]; then
 fi
 
 for file in $OBJECTS; do
-    clang -c -Wall -I headers $CF $file.c -o $file$SUFFIX.o;
-    OUTPUT+="$file$SUFFIX.o "
-    if [[ $? = 0 ]]; then
+    if clang -c -Wall -I headers $CF $file.c -o $file$SUFFIX.o; then
         echo $file.c compiled ;
     else
         echo $file.c did not compile ;
         exit 1 ;
     fi
+    OUTPUT+="$file$SUFFIX.o "
     echo
 done
 
-clang $OUTPUT $CF -lcrypto -o SHA1check$SUFFIX
-if [[ $? = 0 ]]; then
+if clang $OUTPUT $CF -lcrypto -o SHA1check$SUFFIX; then
     echo SHA1check built
 else
     echo
