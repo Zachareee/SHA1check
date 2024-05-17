@@ -24,4 +24,4 @@ if !ERRORLEVEL! == 0 (
 )
 
 del *.o
-pause
+sleep 3
