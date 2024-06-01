@@ -11,7 +11,7 @@
 #include "datatypes.h"
 #include "dir.h"
 #include "paths.h"
-#define LINELEN 128
+#define LINELEN 256
 
 // mallocs a line read from file
 char *get_line(FILE *f) {
