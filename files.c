@@ -61,9 +61,9 @@ void write_to_file(FILE *f, char *format, char *line) {
 
 // writes file count of directory with message, write_dir = true writes whole directory
 int write_file_count(dir_t *directory, char *message, FILE *checkfile, bool write_dir) {
-    int num = count_files_in_dir(directory);
+    unsigned long num = count_files_in_dir(directory);
     char buffer[11] = {0};
-    snprintf(buffer, 10, "%d", num);
+    snprintf(buffer, 10, "%lu", num);
     write_to_file(checkfile, message, buffer);
     if (write_dir)
         write_dir_to_file(directory, 0, checkfile);

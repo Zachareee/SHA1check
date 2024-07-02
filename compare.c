@@ -11,6 +11,9 @@
 #include <windows.h>
 #endif
 
+#define VER1HASHLENGTH 40
+#define VER2HASHLENGTH 23
+
 int is_hex(char c) {
     return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f');
 }
@@ -26,7 +29,7 @@ int matcher(char *str, int ver, int *range) {
                     break;
             }
 
-            if (j - i == 40) {
+            if (j - i == VER1HASHLENGTH) {
                 if (range) {
                     range[0] = i;
                     range[1] = j;
@@ -42,6 +45,12 @@ int matcher(char *str, int ver, int *range) {
                     break;
             }
 
+            // condition to allow size 0 files
+            if (j == 1 && str[i] == '0') {
+                range[0] = i;
+                return 0;
+            }
+
             if (j != 10)
                 continue;
 
@@ -53,16 +62,16 @@ int matcher(char *str, int ver, int *range) {
             if (j != 13)
                 continue;
 
-            for (; i + j < len && j < 23; j++) {
+            for (; i + j < len && j < VER2HASHLENGTH; j++) {
                 if (!is_hex(str[i + j]))
                     break;
             }
 
-            if (j != 23)
+            if (j != VER2HASHLENGTH)
                 continue;
             if (range) {
                 range[0] = i;
-                range[1] = i + 23;
+                range[1] = i + VER2HASHLENGTH;
             }
 
             return 0;
@@ -103,9 +112,9 @@ int compare(char *dir, char *line, int ver) {
     int limit;
 
     if (ver == 1) {
-        limit = 40;
+        limit = VER1HASHLENGTH;
     } else {
-        limit = 23;
+        limit = VER2HASHLENGTH;
     }
 
     int range[2] = {0};
@@ -134,7 +143,8 @@ int compare(char *dir, char *line, int ver) {
     unsigned long long fSize;
 #ifdef _WIN32
     HANDLE fileH = CreateFile(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (fileH == INVALID_HANDLE_VALUE) return -1;
+    if (fileH == INVALID_HANDLE_VALUE)
+        return -1;
 
     LARGE_INTEGER fileSize;
     if (!GetFileSizeEx(fileH, &fileSize)) {
@@ -156,6 +166,12 @@ int compare(char *dir, char *line, int ver) {
         result = (long)strcmp(hash_value, hex);
         // printf("\nExpected: %s\nCurrent:  %s\n", hex, hash_value);
     } else {
+        // condition if file sizes are both 0
+        if (strcmp("0", hex) && !fSize) {
+            fprintf(stderr, "OK\n");
+            return 0;
+        }
+
         long size;
         int stat = sscanf(line + range[1], "%ld", &size);
         if (!stat) {
