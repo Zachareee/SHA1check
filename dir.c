@@ -82,8 +82,8 @@ void write_dir_to_file(dir_t *dir, int level, FILE *f) {
     }
 }
 
-int count_files_in_dir_recurse(dir_t *dir) {
-    int count = 0;
+unsigned long count_files_in_dir_recurse(dir_t *dir) {
+    unsigned long count = 0;
     for (int i = 0; i < dir->num; i++) {
         count += count_files_in_dir_recurse(dir->folder[i]);
     }
@@ -91,8 +91,8 @@ int count_files_in_dir_recurse(dir_t *dir) {
     return count + !dir->num;
 }
 
-int count_files_in_dir(dir_t *dir) {
-    int count = 0;
+unsigned long count_files_in_dir(dir_t *dir) {
+    unsigned long count = 0;
     for (int i = 0; i < dir->num; i++) {
         count += count_files_in_dir_recurse(dir->folder[i]);
     }
