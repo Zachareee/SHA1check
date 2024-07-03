@@ -46,7 +46,7 @@ int matcher(char *str, int ver, int *range) {
             }
 
             // condition to allow size 0 files
-            if (j == 1 && str[i] == '0') {
+            if (j == 1 && str[i] == '0' && (str[i + 1] == '\r' || str[i + 1] == '\n')) {
                 range[0] = i;
                 return 0;
             }
