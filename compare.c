@@ -7,6 +7,12 @@
 #include "files.h"
 #include "hashing.h"
 #include "paths.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
+#define VER1HASHLENGTH 40
+#define VER2HASHLENGTH 23
 
 int is_hex(char c) {
     return ('0' <= c && c <= '9') || ('a' <= c && c <= 'f');
@@ -19,10 +25,11 @@ int matcher(char *str, int ver, int *range) {
         for (int i = 0; i < len; i++) {
             int j = i;
             for (; j < len; j++) {
-                if (!is_hex(str[j])) break;
+                if (!is_hex(str[j]))
+                    break;
             }
 
-            if (j - i == 40) {
+            if (j - i == VER1HASHLENGTH) {
                 if (range) {
                     range[0] = i;
                     range[1] = j;
@@ -34,25 +41,37 @@ int matcher(char *str, int ver, int *range) {
         for (int i = 0; i < len; i++) {
             int j = 0;
             for (; i + j < len && j < 10; j++) {
-                if (!is_hex(str[i + j])) break;
+                if (!is_hex(str[i + j]))
+                    break;
             }
 
-            if (j != 10) continue;
+            // condition to allow size 0 files
+            if (j == 1 && str[i] == '0' && (str[i + 1] == '\r' || str[i + 1] == '\n')) {
+                range[0] = i;
+                return 0;
+            }
+
+            if (j != 10)
+                continue;
 
             for (; i + j < len && j < 13; j++) {
-                if (str[i + j] != '*') break;
+                if (str[i + j] != '*')
+                    break;
             }
 
-            if (j != 13) continue;
+            if (j != 13)
+                continue;
 
-            for (; i + j < len && j < 23; j++) {
-                if (!is_hex(str[i + j])) break;
+            for (; i + j < len && j < VER2HASHLENGTH; j++) {
+                if (!is_hex(str[i + j]))
+                    break;
             }
 
-            if (j != 23) continue;
+            if (j != VER2HASHLENGTH)
+                continue;
             if (range) {
                 range[0] = i;
-                range[1] = i + 23;
+                range[1] = i + VER2HASHLENGTH;
             }
 
             return 0;
@@ -65,8 +84,10 @@ int matcher(char *str, int ver, int *range) {
 // if partial hash given in the form of reghex2, returns 2
 // if unknown, return 0
 int get_hash_ver(char *line) {
-    if (!matcher(line, 1, NULL)) return 1;
-    if (!matcher(line, 2, NULL)) return 2;
+    if (!matcher(line, 1, NULL))
+        return 1;
+    if (!matcher(line, 2, NULL))
+        return 2;
     return 0;
 }
 
@@ -91,15 +112,16 @@ int compare(char *dir, char *line, int ver) {
     int limit;
 
     if (ver == 1) {
-        limit = 40;
+        limit = VER1HASHLENGTH;
     } else {
-        limit = 23;
+        limit = VER2HASHLENGTH;
     }
 
     int range[2] = {0};
     // find hexstring and copy to hex, return -1 if no matches
     int match = matcher(line, ver, range);
-    if (match) return -1;
+    if (match)
+        return -1;
 
     char hex[limit + 1];
     hex[limit] = 0;
@@ -112,21 +134,44 @@ int compare(char *dir, char *line, int ver) {
     char path[PATH_MAX];
     strcpy(path, line);
     concat_path(dir, path);
-    if (!check_exists(path, 1)) return -2;
+    if (!check_exists(path, 1))
+        return -2;
 
     fprintf(stderr, "Checking %s...", get_relative_path(path));
 
     // construct file_struct to give to hash function
+    unsigned long long fSize;
+#ifdef _WIN32
+    HANDLE fileH = CreateFile(path, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (fileH == INVALID_HANDLE_VALUE)
+        return -1;
+
+    LARGE_INTEGER fileSize;
+    if (!GetFileSizeEx(fileH, &fileSize)) {
+        CloseHandle(fileH);
+        return -1;
+    }
+    CloseHandle(fileH);
+    fSize = fileSize.QuadPart;
+#else
     struct stat s;
     stat(path, &s);
+    fSize = s.st_size;
+#endif
 
-    char *hash_value = hash(path, s.st_size);
+    char *hash_value = hash(path, fSize);
 
     long result;
     if (ver == 1) {
-        result = (long) strcmp(hash_value, hex);
+        result = (long)strcmp(hash_value, hex);
         // printf("\nExpected: %s\nCurrent:  %s\n", hex, hash_value);
     } else {
+        // condition if file sizes are both 0
+        if (strcmp("0", hex) && !fSize) {
+            fprintf(stderr, "OK\n");
+            return 0;
+        }
+
         long size;
         int stat = sscanf(line + range[1], "%ld", &size);
         if (!stat) {
@@ -136,9 +181,9 @@ int compare(char *dir, char *line, int ver) {
 
         char temp[24] = {0};
         obf_hash(hash_value, temp);
-        result = (long) strcmp(temp, hex);
+        result = (long)strcmp(temp, hex);
         // printf("\nExpected: %s\nCurrent:  %s\n", hex, temp);
-        result |= s.st_size - size;
+        result |= fSize - size;
     }
 
     fprintf(stderr, "OK\n");
