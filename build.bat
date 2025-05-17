@@ -24,3 +24,4 @@ if !ERRORLEVEL! == 0 (
 )
 
 del *.o
+sleep 3
